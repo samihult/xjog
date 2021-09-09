@@ -1,0 +1,1 @@
+    "test:e2e": "echo should run 'cd e2e && ./runPostgresTests.sh'",

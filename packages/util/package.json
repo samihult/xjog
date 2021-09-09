@@ -1,0 +1,41 @@
+{
+  "name": "@samihult/xjog-util",
+  "version": "0.0.22",
+  "description": "XJog utils",
+  "engines": {
+    "npm": "forbidden",
+    "yarn": "^1.22.8",
+    "node": ">=12.0.0"
+  },
+  "keywords": [
+    "statechart",
+    "harel",
+    "xjog"
+  ],
+  "repository": "https://github.com/samihult/xjog",
+  "homepage": "https://www.xjog.io/",
+  "author": "Sami Hult <sami.hult@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "main": "lib",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prePublishOnly": "yarn build"
+  },
+  "dependencies": {
+    "rfc6902": "^5.0.1",
+    "xstate": "4.26.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
+    "jest": "^28.1.2",
+    "prettier": "^2.3.2",
+    "typescript": "^4.7.4"
+  },
+  "gitHead": "3083025da45556b583ea98bbc559d46530e138c7"
+}

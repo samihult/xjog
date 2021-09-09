@@ -1,0 +1,8 @@
+{
+  "transform": {
+    "^.+\\.(t|j)sx?$": "@swc/jest"
+  },
+  "rootDir": "int",
+  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+}

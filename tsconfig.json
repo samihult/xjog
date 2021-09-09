@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "declaration": true,
+    "strict": true,
+    "allowJs": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}

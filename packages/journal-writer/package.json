@@ -1,0 +1,42 @@
+{
+  "name": "@samihult/xjog-journal-writer",
+  "version": "0.0.57",
+  "description": "XJog chart journal writer",
+  "engines": {
+    "npm": "forbidden",
+    "yarn": "^1.22.8",
+    "node": "16.x"
+  },
+  "keywords": [
+    "statechart",
+    "harel",
+    "xjog"
+  ],
+  "repository": "https://github.com/samihult/xjog",
+  "homepage": "https://www.xjog.io/",
+  "author": "Sami Hult <sami.hult@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "main": "lib",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prePublishOnly": "yarn build"
+  },
+  "dependencies": {
+    "@samihult/xjog-journal-persistence": "^0.0.39",
+    "@samihult/xjog-util": "^0.0.22"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.7.10",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
+    "jest": "^28.1.2",
+    "prettier": "^2.3.2",
+    "typescript": "^4.7.4"
+  },
+  "gitHead": "32a6ebcbcffae3eb711c154daa82da434bc512e9"
+}

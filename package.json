@@ -1,0 +1,18 @@
+{
+  "name": "@xjog/packages",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "npm": "forbidden",
+    "yarn": "^1.22.8",
+    "node": "16.x"
+  },
+  "scripts": {
+    "clean:modules": "./scripts/rm-all-node_modules.sh"
+  },
+  "devDependencies": {
+    "lerna": "^6.0.1"
+  }
+}

@@ -1,0 +1,130 @@
+import { EventObject, StateValue, matchesState } from 'xstate';
+import { ChartReference } from 'xjog';
+
+import { DeltaState } from './DeltaJournalAdapter';
+
+/**
+ * @example
+ *   filter: {
+ *     and: [
+ *       {
+ *         machineId: '.*(configuration|cart item)',
+ *         parent: {
+ *           machineId: 'checkout',
+ *           chartId: '8123897192837912873',
+ *         },
+ *       },
+ *       {
+ *         or: [
+ *           {
+ *             state: 'progress.\\.*.error',
+ *           },
+ *           {
+ *             externalIdentifiers: {
+ *               claudiaOrderStatus: 'CANCEL|ERROR',
+ *             },
+ *           },
+ *         ],
+ *       },
+ *     ],
+ *   },
+ */
+export type ChartFilter =
+  | {
+      and: ChartFilter[];
+    }
+  | {
+      or: ChartFilter[];
+    }
+  | {
+      /** RegExp */
+      machineId?: string;
+      /** RegExp */
+      chartId?: string;
+      /** StateValue */
+      state?: StateValue;
+      externalIdentifiers?: {
+        /** RegExp */
+        [key: string]: string;
+      };
+    };
+
+/**
+ * @ignore
+ */
+export function deltaMatchesFilter<
+  TContext,
+  TEvent extends EventObject = EventObject,
+>(filter: ChartFilter, delta: DeltaState<TContext, TEvent>): boolean {
+  // It's a grouping operator
+
+  if ('and' in filter) {
+    for (const operand of filter.and) {
+      if (
+        !deltaMatchesFilter(
+          operand,
+          delta,
+          // getParentRef,
+          // getExternalIdentifiers,
+        )
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  if ('or' in filter) {
+    for (const operand of filter.or) {
+      if (
+        deltaMatchesFilter(
+          operand,
+          delta,
+          // getParentRef,
+          // getExternalIdentifiers,
+        )
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // It's a matcher
+
+  if ('machineId' in filter && filter.machineId) {
+    if (!delta.ref.machineId.match(new RegExp(filter.machineId))) {
+      return false;
+    }
+  }
+
+  if ('chartId' in filter && filter.chartId) {
+    if (!delta.ref.chartId.match(new RegExp(filter.chartId))) {
+      return false;
+    }
+  }
+
+  if ('state' in filter && filter.state) {
+    if (!matchesState(filter.state, delta.state)) {
+      return false;
+    }
+  }
+
+  if ('externalIdentifiers' in filter && filter.externalIdentifiers) {
+    // TODO make this a db-level op
+    throw new Error('Filtering by external identifier is not supported yet');
+    // for (const [key, pattern] of Object.entries(filter.externalIdentifiers)) {
+    //   const externalIdentifiers = await getExternalIdentifiers(key);
+    //   const matcher = new RegExp(pattern);
+    //   if (
+    //     !externalIdentifiers.some((externalIdentifier) =>
+    //       externalIdentifier.match(matcher),
+    //     )
+    //   ) {
+    //     return false;
+    //   }
+    // }
+  }
+
+  return true;
+}

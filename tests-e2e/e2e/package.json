@@ -1,0 +1,22 @@
+{
+  "name": "xjog-e2e-tests",
+  "version": "0.0.0",
+  "description": "XJog E2E test runner modules",
+  "repository": "https://github.com/samihult/xjog",
+  "homepage": "https://www.xjog.io/",
+  "author": "Sami Hult <sami.hult@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "test": "jest --config jestconfig.e2e.json --runInBand --passWithNoTests"
+  },
+  "dependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.2.223",
+    "@swc/jest": "^0.2.22",
+    "jest": "^28.1.2",
+    "node-pg-migrate": "^6.2.1",
+    "pg": "^8.7.3",
+    "xjog": "./xjog.tgz"
+  }
+}

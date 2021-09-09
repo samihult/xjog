@@ -1,0 +1,53 @@
+{
+  "name": "@samihult/xjog-journal-pg",
+  "version": "0.0.92",
+  "description": "XJog Postgres journaling persistence",
+  "engines": {
+    "npm": "forbidden",
+    "yarn": "^1.22.8",
+    "node": "16.x"
+  },
+  "keywords": [
+    "statechart",
+    "harel",
+    "xjog"
+  ],
+  "repository": "https://github.com/samihult/xjog",
+  "homepage": "https://www.xjog.io/",
+  "author": "Sami Hult <sami.hult@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "main": "lib",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "build": "yarn build:bin ; yarn build:files",
+    "build:bin": "tsc",
+    "build:files": "cpx-fixed 'src/**/*.sql' lib",
+    "prePublishOnly": "yarn build"
+  },
+  "dependencies": {
+    "@samihult/xjog-core-persistence": "^0.0.26",
+    "@samihult/xjog-journal-persistence": "^0.0.39",
+    "@samihult/xjog-util": "^0.0.22",
+    "node-pg-migrate": "^6.2.1",
+    "pg": "^8.7.3",
+    "pg-bind": "^1.0.1",
+    "pg-listen": "^1.7.0",
+    "rfc6902": "^5.0.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.7.10",
+    "@types/pg": "^8.6.5",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
+    "cpx-fixed": "^1.6.0",
+    "jest": "^28.1.2",
+    "prettier": "^2.3.2",
+    "typescript": "^4.7.4"
+  },
+  "gitHead": "32a6ebcbcffae3eb711c154daa82da434bc512e9"
+}
