@@ -102,7 +102,7 @@ export class XJogChart<
   public readonly component = 'chart';
 
   public readonly xJog: XJog;
-  private readonly persistence: PersistenceAdapter | null;
+  private readonly persistence: PersistenceAdapter;
 
   private stopping = false;
 
@@ -590,7 +590,7 @@ export class XJogChart<
 
         await this.xJog.timeExecution('chart.send.update chart', async () => {
           trace({ message: 'Updating chart' });
-          await this.persistence?.updateChart(this.ref, this.state, cid);
+          await this.persistence.updateChart(this.ref, this.state, cid);
         });
 
         this.xJog.changeSubject.next(change);

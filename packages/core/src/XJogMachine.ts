@@ -53,7 +53,7 @@ export class XJogMachine<
   public readonly options: ResolvedXJogMachineOptions;
 
   /** @private Persistence adapter from the XJog instance */
-  public readonly persistence: PersistenceAdapter | null;
+  public readonly persistence: PersistenceAdapter;
 
   private chartCacheKeys = new Set<string>();
   private chartCacheStore: {
