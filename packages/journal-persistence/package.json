@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-journal-persistence",
-  "version": "0.0.39",
+  "version": "0.0.40",
   "description": "XJog chart abstract journal persistence adapter",
   "engines": {
     "npm": "forbidden",
@@ -28,7 +28,7 @@
     "prePublishOnly": "yarn build"
   },
   "dependencies": {
-    "@samihult/xjog-util": "^0.0.22",
+    "@samihult/xjog-util": "^0.0.23",
     "rfc6902": "^5.0.1",
     "rxjs": "^7.4.0",
     "uuid": "^8.3.2"

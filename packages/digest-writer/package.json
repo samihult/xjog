@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-digest-writer",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "XJog chart digest writer",
   "engines": {
     "npm": "forbidden",
