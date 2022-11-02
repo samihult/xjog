@@ -368,7 +368,7 @@ export class XJogActivityManager {
     }
   }
 
-  public async stopAndUnregisteredActivity(
+  private async stopAndUnregisteredActivity(
     activity: ActivityRef,
     cid = getCorrelationIdentifier(),
   ): Promise<void> {
@@ -383,19 +383,11 @@ export class XJogActivityManager {
         ...args,
       );
 
-    trace('Acquiring mutex');
-    const releaseMutex = await this.activityMutex.acquire();
+    trace({ message: 'Stopping activity' });
+    await activity.stop?.();
 
-    try {
-      trace({ message: 'Stopping activity' });
-      await activity.stop?.();
-
-      trace({ message: 'Unregistering activity' });
-      await this.unregisterActivity(activity, cid);
-    } finally {
-      trace('Releasing mutex');
-      releaseMutex();
-    }
+    trace({ message: 'Unregistering activity' });
+    await this.unregisterActivity(activity, cid);
   }
 
   private async unregisterActivity(
@@ -489,53 +481,73 @@ export class XJogActivityManager {
     ref: ChartReference,
     cid = getCorrelationIdentifier(),
   ): Promise<void> {
-    const trace = (args: Record<string, any>) =>
-      this.xJog.trace({
-        cid,
-        in: 'activityManager.stopAllForChart',
-        ref,
+    const trace = (...args: Array<string | Record<string, unknown>>) =>
+      this.xJog.trace(
+        {
+          cid,
+          in: 'activityManager.stopAllForChart',
+          ref,
+        },
         ...args,
-      });
+      );
 
-    for (const activity of this.ongoingActivities
-      .get(ref.machineId)
-      ?.get(ref.chartId)
-      ?.values() ?? []) {
-      trace({
-        message: 'Stopping and unregistering activity',
-        activityId: activity.id,
-      });
-      await this.stopAndUnregisteredActivity(activity, cid);
+    trace('Acquiring mutex');
+    const releaseMutex = await this.activityMutex.acquire();
+
+    try {
+      for (const activity of this.ongoingActivities
+        .get(ref.machineId)
+        ?.get(ref.chartId)
+        ?.values() ?? []) {
+        trace({
+          message: 'Stopping and unregistering activity',
+          activityId: activity.id,
+        });
+        await this.stopAndUnregisteredActivity(activity, cid);
+      }
+    } finally {
+      trace('Releasing mutex');
+      releaseMutex();
     }
   }
 
   public async stopAllActivities(
     cid = getCorrelationIdentifier(),
   ): Promise<void> {
-    const trace = (args: Record<string, any>) =>
-      this.xJog.trace({
-        cid,
-        in: 'activityManager.stopAllActivities',
+    const trace = (...args: Array<string | Record<string, unknown>>) =>
+      this.xJog.trace(
+        {
+          cid,
+          in: 'activityManager.stopAllActivities',
+        },
         ...args,
-      });
+      );
 
     trace({ message: 'Stopping all activities' });
 
-    for (const machine of this.ongoingActivities.values()) {
-      for (const chart of machine.values()) {
-        for (const activity of chart.values()) {
-          trace({
-            message: 'Stopping and unregistering activity',
-            activityId: activity.id,
-          });
-          await this.stopAndUnregisteredActivity(activity, cid);
-        }
-        chart.clear();
-      }
-      machine.clear();
-    }
+    trace('Acquiring mutex');
+    const releaseMutex = await this.activityMutex.acquire();
 
-    trace({ message: 'Clearing all the activities' });
-    this.ongoingActivities.clear();
+    try {
+      for (const machine of this.ongoingActivities.values()) {
+        for (const chart of machine.values()) {
+          for (const activity of chart.values()) {
+            trace({
+              message: 'Stopping and unregistering activity',
+              activityId: activity.id,
+            });
+            await this.stopAndUnregisteredActivity(activity, cid);
+          }
+          chart.clear();
+        }
+        machine.clear();
+      }
+
+      trace({ message: 'Clearing all the activities' });
+      this.ongoingActivities.clear();
+    } finally {
+      trace('Releasing mutex');
+      releaseMutex();
+    }
   }
 }
