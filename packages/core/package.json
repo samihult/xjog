@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog",
-  "version": "0.0.295",
+  "version": "0.0.296",
   "description": "XState chart runner for long-running charts",
   "engines": {
     "npm": "forbidden",
