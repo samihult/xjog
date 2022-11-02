@@ -17,6 +17,8 @@ import { XJog } from './XJog';
  * @group XJog
  */
 export class XJogActivityManager {
+  public readonly activityMutex: MutexInterface;
+  // TODO is this necessary with the other mutex?
   public readonly activityDbMutex: MutexInterface;
 
   /**
@@ -45,6 +47,11 @@ export class XJogActivityManager {
 
   public constructor(private readonly xJog: XJog) {
     this.activityDbMutex = withTimeout(
+      new Mutex(),
+      // TODO make this configurable separately
+      xJog.options.chartMutexTimeout,
+    );
+    this.activityMutex = withTimeout(
       new Mutex(),
       // TODO make this configurable separately
       xJog.options.chartMutexTimeout,
@@ -112,181 +119,188 @@ export class XJogActivityManager {
     activity: ActivityRef,
     cid = getCorrelationIdentifier(),
   ): Promise<void> {
-    const trace = (args: Record<string, any>) =>
-      this.xJog.trace({
-        cid,
-        in: 'activityManager.registerActivity',
-        id: activity.id,
-        owner: activity.owner,
+    const trace = (...args: Array<string | Record<string, unknown>>) =>
+      this.xJog.trace(
+        {
+          cid,
+          in: 'activityManager.registerActivity',
+          id: activity.id,
+          owner: activity.owner,
+        },
         ...args,
-      });
+      );
 
     if (!activity.owner || !activity.id) {
       throw new Error('Regular activities must have an owner and an id');
     }
 
-    trace({
-      in: 'activityManager.registerActivity',
-      message: 'Registering activity',
-    });
+    trace('Acquiring mutex');
+    const releaseMutex = await this.activityMutex.acquire();
 
-    if (!this.ongoingActivities.has(activity.owner.machineId)) {
-      this.ongoingActivities.set(activity.owner.machineId, new Map());
-    }
+    try {
+      trace('Registering activity');
 
-    if (!this.ongoingActivitySubscriptions.has(activity.owner.machineId)) {
-      this.ongoingActivitySubscriptions.set(
-        activity.owner.machineId,
-        new Map(),
-      );
-    }
+      if (!this.ongoingActivities.has(activity.owner.machineId)) {
+        this.ongoingActivities.set(activity.owner.machineId, new Map());
+      }
 
-    if (
-      !this.ongoingActivities
-        .get(activity.owner.machineId)
-        ?.has(activity.owner.chartId)
-    ) {
+      if (!this.ongoingActivitySubscriptions.has(activity.owner.machineId)) {
+        this.ongoingActivitySubscriptions.set(
+          activity.owner.machineId,
+          new Map(),
+        );
+      }
+
+      if (
+        !this.ongoingActivities
+          .get(activity.owner.machineId)
+          ?.has(activity.owner.chartId)
+      ) {
+        this.ongoingActivities
+          .get(activity.owner.machineId)
+          ?.set(activity.owner.chartId, new Map());
+      }
+
+      if (
+        !this.ongoingActivitySubscriptions
+          .get(activity.owner.machineId)
+          ?.has(activity.owner.chartId)
+      ) {
+        this.ongoingActivitySubscriptions
+          .get(activity.owner.machineId)
+          ?.set(activity.owner.chartId, new Map());
+      }
+
       this.ongoingActivities
         .get(activity.owner.machineId)
-        ?.set(activity.owner.chartId, new Map());
-    }
+        ?.get(activity.owner.chartId)
+        ?.set(activity.id, activity);
 
-    if (
-      !this.ongoingActivitySubscriptions
-        .get(activity.owner.machineId)
-        ?.has(activity.owner.chartId)
-    ) {
-      this.ongoingActivitySubscriptions
-        .get(activity.owner.machineId)
-        ?.set(activity.owner.chartId, new Map());
-    }
+      trace({
+        in: 'activityManager.registerActivity',
+        message: 'Registered activity, subscribing',
+      });
 
-    this.ongoingActivities
-      .get(activity.owner.machineId)
-      ?.get(activity.owner.chartId)
-      ?.set(activity.id, activity);
-
-    trace({
-      in: 'activityManager.registerActivity',
-      message: 'Registered activity, subscribing',
-    });
-
-    const subscription = activity.subscribe({
-      next: (value) => {
-        trace({
-          in: 'activityManager.subscriber',
-          message: 'Activity emitted a value',
-          value,
-        });
-
-        if (activity.owner) {
+      const subscription = activity.subscribe({
+        next: (value) => {
           trace({
             in: 'activityManager.subscriber',
-            message: 'Notifying owner',
+            message: 'Activity emitted a value',
             value,
           });
 
-          this.xJog.deferredEventManager.defer(
-            {
-              ref: activity.owner,
-              delay: 0,
-              event: toSCXMLEvent(value),
-            },
-            cid,
-          );
-        }
-      },
+          if (activity.owner) {
+            trace({
+              in: 'activityManager.subscriber',
+              message: 'Notifying owner',
+              value,
+            });
 
-      error: (error) => {
-        trace({
-          level: 'debug',
-          in: 'activityManager.subscriber',
-          message: 'Activity emitted an error',
-          error,
-        });
+            this.xJog.deferredEventManager.defer(
+              {
+                ref: activity.owner,
+                delay: 0,
+                event: toSCXMLEvent(value),
+              },
+              cid,
+            );
+          }
+        },
 
-        if (activity.owner) {
+        error: (error) => {
           trace({
+            level: 'debug',
             in: 'activityManager.subscriber',
-            message: 'Notifying owner',
+            message: 'Activity emitted an error',
             error,
           });
 
-          this.xJog.sendEvent(
-            activity.owner,
-            actions.error(activity.id, error),
-          );
-        }
-      },
+          if (activity.owner) {
+            trace({
+              in: 'activityManager.subscriber',
+              message: 'Notifying owner',
+              error,
+            });
 
-      complete: () => {
-        trace({
-          in: 'activityManager.subscriber',
-          message: 'Activity completed',
-        });
+            this.xJog.sendEvent(
+              activity.owner,
+              actions.error(activity.id, error),
+            );
+          }
+        },
 
-        if (activity.owner) {
+        complete: () => {
           trace({
             in: 'activityManager.subscriber',
-            message: 'Stopping activity',
+            message: 'Activity completed',
           });
 
-          this.stopActivity(activity.owner, activity.id);
-        }
-      },
-    });
+          if (activity.owner) {
+            trace({
+              in: 'activityManager.subscriber',
+              message: 'Stopping activity',
+            });
 
-    this.ongoingActivitySubscriptions
-      .get(activity.owner.machineId)
-      ?.get(activity.owner.chartId)
-      ?.set(activity.id, subscription);
-
-    if (activity.owner) {
-      trace({
-        in: 'activityManager.registerActivity',
-        message: 'Storing activity to the database',
+            this.stopActivity(activity.owner, activity.id);
+          }
+        },
       });
 
-      const releaseMutex = await this.activityDbMutex.acquire();
+      this.ongoingActivitySubscriptions
+        .get(activity.owner.machineId)
+        ?.get(activity.owner.chartId)
+        ?.set(activity.id, subscription);
 
-      await this.xJog.persistence.registerActivity(
-        activity.owner,
-        activity.id,
-        cid,
-      );
-
-      releaseMutex();
-
-      if (activity.autoForward) {
+      if (activity.owner) {
         trace({
           in: 'activityManager.registerActivity',
-          message: 'Registering auto-forward receivers',
+          message: 'Storing activity to the database',
         });
 
-        if (!this.autoForwards.has(activity.owner.machineId)) {
-          this.autoForwards.set(activity.owner.machineId, new Map());
-        }
+        const releaseDbMutex = await this.activityDbMutex.acquire();
 
-        if (
-          !this.autoForwards
-            .get(activity.owner.machineId)
-            ?.has(activity.owner.chartId)
-        ) {
+        await this.xJog.persistence.registerActivity(
+          activity.owner,
+          activity.id,
+          cid,
+        );
+
+        releaseDbMutex();
+
+        if (activity.autoForward) {
+          trace({
+            in: 'activityManager.registerActivity',
+            message: 'Registering auto-forward receivers',
+          });
+
+          if (!this.autoForwards.has(activity.owner.machineId)) {
+            this.autoForwards.set(activity.owner.machineId, new Map());
+          }
+
+          if (
+            !this.autoForwards
+              .get(activity.owner.machineId)
+              ?.has(activity.owner.chartId)
+          ) {
+            this.autoForwards
+              .get(activity.owner.machineId)
+              ?.set(activity.owner.chartId, new Set());
+          }
+
           this.autoForwards
             .get(activity.owner.machineId)
-            ?.set(activity.owner.chartId, new Set());
+            ?.get(activity.owner.chartId)
+            ?.add(activity.id);
+
+          trace({
+            in: 'activityManager.registerActivity',
+            message: 'Registered auto-forward receivers',
+          });
         }
-
-        this.autoForwards
-          .get(activity.owner.machineId)
-          ?.get(activity.owner.chartId)
-          ?.add(activity.id);
-
-        trace({
-          in: 'activityManager.registerActivity',
-          message: 'Registered auto-forward receivers',
-        });
       }
+    } finally {
+      trace('Releasing mutex');
+      releaseMutex();
     }
   }
 
@@ -320,27 +334,37 @@ export class XJogActivityManager {
     activityId: string,
     cid = getCorrelationIdentifier(),
   ): Promise<void> {
-    const trace = (args: Record<string, any>) =>
-      this.xJog.trace({
-        cid,
-        in: 'activityManager.stopActivity',
-        ref,
-        activityId,
+    const trace = (...args: Array<string | Record<string, unknown>>) =>
+      this.xJog.trace(
+        {
+          cid,
+          in: 'activityManager.stopActivity',
+          ref,
+          activityId,
+        },
         ...args,
-      });
+      );
 
-    trace({ message: 'Attempting to stop activity' });
+    trace('Acquiring mutex');
+    const releaseMutex = await this.activityMutex.acquire();
 
-    const activity = this.ongoingActivities
-      .get(ref.machineId)
-      ?.get(ref.chartId)
-      ?.get(activityId);
+    try {
+      trace({ message: 'Attempting to stop activity' });
 
-    if (activity) {
-      await this.stopAndUnregisteredActivity(activity, cid);
-      trace({ message: 'Stopped and unregistered activity' });
-    } else {
-      trace({ level: 'warning', message: 'Activity not found' });
+      const activity = this.ongoingActivities
+        .get(ref.machineId)
+        ?.get(ref.chartId)
+        ?.get(activityId);
+
+      if (activity) {
+        await this.stopAndUnregisteredActivity(activity, cid);
+        trace({ message: 'Stopped and unregistered activity' });
+      } else {
+        trace({ level: 'warning', message: 'Activity not found' });
+      }
+    } finally {
+      trace('Releasing mutex');
+      releaseMutex();
     }
   }
 
@@ -348,20 +372,30 @@ export class XJogActivityManager {
     activity: ActivityRef,
     cid = getCorrelationIdentifier(),
   ): Promise<void> {
-    const trace = (args: Record<string, any>) =>
-      this.xJog.trace({
-        cid,
-        in: 'activityManager.stopAndUnregisteredActivity',
-        owner: activity.owner,
-        activityId: activity.id,
+    const trace = (...args: Array<string | Record<string, unknown>>) =>
+      this.xJog.trace(
+        {
+          cid,
+          in: 'activityManager.stopAndUnregisteredActivity',
+          owner: activity.owner,
+          activityId: activity.id,
+        },
         ...args,
-      });
+      );
 
-    trace({ message: 'Stopping activity' });
-    await activity.stop?.();
+    trace('Acquiring mutex');
+    const releaseMutex = await this.activityMutex.acquire();
 
-    trace({ message: 'Unregistering activity' });
-    await this.unregisterActivity(activity, cid);
+    try {
+      trace({ message: 'Stopping activity' });
+      await activity.stop?.();
+
+      trace({ message: 'Unregistering activity' });
+      await this.unregisterActivity(activity, cid);
+    } finally {
+      trace('Releasing mutex');
+      releaseMutex();
+    }
   }
 
   private async unregisterActivity(
