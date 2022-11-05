@@ -175,7 +175,7 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
         '  "id", "created", "timestamp", ' +
         '  "ownerId", "machineId", "chartId", ' +
         '  "parentMachineId", "parentChartId", ' +
-        '  "event", "state", "context",' +
+        '  "event", "state", "context", ' +
         '  "actions" ' +
         ') ' +
         'VALUES (' +
@@ -189,7 +189,7 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
         '  "machineId", "chartId" ' +
         ') DO UPDATE SET ' +
         '  "id" = :id, "timestamp" = to_timestamp(:timestamp::decimal / 1000), ' +
-        '  "event" = :event, "state" = :state, "context" = :context,' +
+        '  "event" = :event, "state" = :state, "context" = :context, ' +
         '  "actions" = :actions ' +
         'WHERE "fullJournalStates"."id" < :id ',
       {
@@ -241,7 +241,7 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
   private readonly journalEntrySqlSelectFields =
     '  "id", extract(epoch from "timestamp") * 1000 as "timestamp", ' +
     '  "machineId", "chartId", "event", ' +
-    '  "state", "stateDelta", "context", "contextDelta",' +
+    '  "state", "stateDelta", "context", "contextDelta", ' +
     '  "actions" ';
 
   public async readEntry(id: number): Promise<JournalEntry | null> {
