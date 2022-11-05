@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-core-pg",
-  "version": "0.0.49",
+  "version": "0.0.50",
   "description": "XJog chart Postgres persistence",
   "engines": {
     "npm": "forbidden",
@@ -28,8 +28,8 @@
     "prePublishOnly": "yarn build"
   },
   "dependencies": {
-    "@samihult/xjog-core-persistence": "^0.0.27",
-    "@samihult/xjog-util": "^0.0.23",
+    "@samihult/xjog-core-persistence": "^0.0.28",
+    "@samihult/xjog-util": "^0.0.24",
     "node-pg-migrate": "^6.2.1",
     "pg": "^8.7.3",
     "pg-bind": "^1.0.1",
