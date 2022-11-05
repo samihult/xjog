@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-journal-pg",
-  "version": "0.0.99",
+  "version": "0.0.100",
   "description": "XJog Postgres journaling persistence",
   "engines": {
     "npm": "forbidden",
