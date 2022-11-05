@@ -129,8 +129,6 @@ export class XJogMachine<
    */
   public async createChart(
     chartId: string = uuidV4(),
-    initialContext?: TContext, // TODO <-- put into options (separate for createChart and getChart)
-    parentChart?: ChartReference, // TODO <-- put into options (separate for createChart and getChart)
     options?: XJogChartOptions,
   ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState>> {
     const trace = (...args: Array<string | Record<string, unknown>>) =>
@@ -146,8 +144,8 @@ export class XJogMachine<
     >(this, {
       ...options,
       id: chartId,
-      parentRef: parentChart,
-      initialContext,
+      parentRef: options?.parentRef,
+      initialContext: options?.initialContext,
     });
 
     this.refreshCache(chart);

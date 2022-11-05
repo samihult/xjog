@@ -375,7 +375,6 @@ export class XJog extends XJogLogEmitter {
   >(
     key: string,
     value: string,
-    context?: Partial<TContext> | ((context: TContext) => Partial<TContext>),
     cid = getCorrelationIdentifier(),
   ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState> | null> {
     return this.timeExecution('xjog.get chart by external id', async () => {
@@ -414,11 +413,15 @@ export class XJog extends XJogLogEmitter {
     });
   }
 
-  public async sendEvent<TEvent extends EventObject = EventObject>(
+  // TODO check the typings
+  public async sendEvent<
+    TContext = DefaultContext,
+    TEvent extends EventObject = EventObject,
+  >(
     ref: ChartReference,
     event: Event<TEvent> | SCXML.Event<TEvent>,
     origin?: ChartReference,
-    context?: any | ((context: any) => any),
+    context?: Partial<TContext> | ((context: TContext) => TContext),
     id: string | number = uuidV4(),
     cid = getCorrelationIdentifier(),
   ): Promise<State<any> | null> {
