@@ -54,7 +54,7 @@ export function resolveXJogCreateStateChange<
     type: 'create',
     ref,
     parentRef,
-    event: toEventObject(state._event),
+    event: toEventObject(state.event),
     old: null,
     new: mapState(state),
   };
@@ -79,7 +79,7 @@ export function resolveXJogUpdateStateChange<
     type: 'update',
     ref,
     parentRef,
-    event: toEventObject(nextState._event),
+    event: toEventObject(nextState.event),
     old: mapState(previousState),
     new: mapState(nextState),
   };
