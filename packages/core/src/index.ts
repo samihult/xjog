@@ -10,4 +10,4 @@ export * from './XJogDeferredEventManager';
 
 export * from './XJogOptions';
 export * from './XJogMachineOptions';
-export * from './XJogChartOptions';
+export * from './XJogChartCreationOptions';

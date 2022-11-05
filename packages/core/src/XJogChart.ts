@@ -60,8 +60,8 @@ import { XJog } from './XJog';
 import {
   ResolvedXJogChartOptions,
   resolveXJogChartOptions,
-  XJogChartOptions,
-} from './XJogChartOptions';
+  XJogChartCreationOptions,
+} from './XJogChartCreationOptions';
 
 export type XJogSendAction<
   TContext = any,
@@ -136,7 +136,6 @@ export class XJogChart<
     this.options = resolveXJogChartOptions(
       xJogMachine.xJog.options,
       xJogMachine.options,
-      options,
     );
 
     this.xJog = xJogMachine.xJog;
@@ -171,14 +170,14 @@ export class XJogChart<
       TTypeState,
       TEmitted
     >,
-    options?: XJogChartOptions<TContext>,
+    options?: XJogChartCreationOptions<TContext>,
   ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState, TEmitted>> {
     return xJogMachine.xJog.timeExecution('chart.create', async () => {
       const instanceId = xJogMachine.xJog.id;
 
       const ref: ChartReference = {
         machineId: xJogMachine.id,
-        chartId: options?.id ?? uuidV4(),
+        chartId: options?.chartId ?? uuidV4(),
       };
 
       const parentRef: ChartReference | null = options?.parentRef ?? null;
@@ -245,7 +244,6 @@ export class XJogChart<
             resolveXJogChartOptions(
               xJogMachine.xJog.options,
               xJogMachine.options,
-              options,
             ),
           ),
       );
@@ -274,8 +272,6 @@ export class XJogChart<
   >(
     xJogMachine: XJogMachine<TContext, TStateSchema, TEvent, TTypeState>,
     chartId: string,
-    contextPatch?: any | ((context: TContext) => TContext),
-    options?: XJogChartOptions<TContext>,
   ): Promise<XJogChart<
     TContext,
     TStateSchema,
@@ -313,11 +309,7 @@ export class XJogChart<
         chartId,
         parentRef,
         state,
-        resolveXJogChartOptions(
-          xJogMachine.xJog.options,
-          xJogMachine.options,
-          options,
-        ),
+        resolveXJogChartOptions(xJogMachine.xJog.options, xJogMachine.options),
       );
     });
   }

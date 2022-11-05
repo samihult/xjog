@@ -16,7 +16,7 @@ import {
   Typestate,
 } from 'xstate';
 
-import { XJogChartOptions } from './XJogChartOptions';
+import { XJogChartCreationOptions } from './XJogChartCreationOptions';
 import { XJogChart } from './XJogChart';
 import { XJog } from './XJog';
 
@@ -128,11 +128,11 @@ export class XJogMachine<
    *   parent–child communication when a parent chart spawns child charts.
    */
   public async createChart(
-    options?: XJogChartOptions,
+    options?: XJogChartCreationOptions,
   ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState>> {
     const trace = (...args: Array<string | Record<string, unknown>>) =>
       this.trace(
-        { in: 'createChart', chartId: options?.id ?? '(generated)' },
+        { in: 'createChart', chartId: options?.chartId ?? '(generated)' },
         ...args,
       );
 
@@ -143,12 +143,7 @@ export class XJogMachine<
       TStateSchema,
       TTypeState,
       TEmitted
-    >(this, {
-      ...options,
-      id: options?.id,
-      parentRef: options?.parentRef,
-      initialContext: options?.initialContext,
-    });
+    >(this, options);
 
     this.refreshCache(chart);
 
@@ -158,15 +153,13 @@ export class XJogMachine<
 
   /**
    * @param chartId Unique identifier of the chart.
-   * @param contextPatch
-   * @param options
+   * @param cid
    */
   public async getChart(
     chartId: string,
-    contextPatch?: any | ((context: TContext) => TContext),
-    options?: XJogChartOptions,
+    cid = getCorrelationIdentifier(),
   ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState> | null> {
-    const logPayload = { in: 'getChart', chartId };
+    const logPayload = { in: 'getChart', cid, chartId };
 
     const trace = (...args: Array<string | Record<string, unknown>>) =>
       this.trace(logPayload, ...args);
@@ -186,7 +179,7 @@ export class XJogMachine<
         TStateSchema,
         TEvent,
         TTypeState
-      >(this, chartId, contextPatch, options);
+      >(this, chartId);
 
       if (!chart) {
         debug('Failed to load');
