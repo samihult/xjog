@@ -47,7 +47,7 @@ CREATE TABLE "fullJournalStates" (
   "context" BYTEA DEFAULT NULL,
 
   -- Actions triggered by the transition
-  "actions" BYTEA NOT NULL
+  "actions" BYTEA NOT NULL,
 
   PRIMARY KEY("machineId", "chartId")
 );
