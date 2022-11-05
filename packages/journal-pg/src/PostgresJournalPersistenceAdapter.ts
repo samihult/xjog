@@ -138,9 +138,8 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
         '  "actions" ' +
         ') ' +
         'VALUES (' +
-        '  :machineId, :chartId, :event, ' +
-        '  NULL, NULL, :stateDelta, :contextDelta,' +
-        '  :actions ' +
+        '  :machineId, :chartId, :event, NULL, NULL, ' +
+        '  :stateDelta, :contextDelta, :actions ' +
         ') ' +
         'RETURNING ' +
         '  "id", extract(epoch from "timestamp") * 1000 as "timestamp" ',
