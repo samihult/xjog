@@ -128,11 +128,13 @@ export class XJogMachine<
    *   parent–child communication when a parent chart spawns child charts.
    */
   public async createChart(
-    chartId: string = uuidV4(),
     options?: XJogChartOptions,
   ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState>> {
     const trace = (...args: Array<string | Record<string, unknown>>) =>
-      this.trace({ in: 'createChart', chartId }, ...args);
+      this.trace(
+        { in: 'createChart', chartId: options?.id ?? '(generated)' },
+        ...args,
+      );
 
     trace('Creating chart');
     const chart = await XJogChart.create<
@@ -143,14 +145,14 @@ export class XJogMachine<
       TEmitted
     >(this, {
       ...options,
-      id: chartId,
+      id: options?.id,
       parentRef: options?.parentRef,
       initialContext: options?.initialContext,
     });
 
     this.refreshCache(chart);
 
-    trace({ message: 'Done' });
+    trace({ message: 'Done', chartId: chart.id });
     return chart;
   }
 
