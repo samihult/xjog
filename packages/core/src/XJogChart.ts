@@ -457,7 +457,7 @@ export class XJogChart<
       console.log('*** ACTIONS', JSON.stringify(this.state.actions, null, 2));
 
       this.xJog.changeSubject.next(change);
-      this.xjog.changeSubject.complete();
+      this.xJog.changeSubject.complete();
     });
   }
 
