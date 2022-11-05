@@ -19,7 +19,10 @@ CREATE TABLE "journalEntries" (
   -- Change set between this and previous entry, can be used for time travel
   "stateDelta" BYTEA NOT NULL,
   -- Change set between this and previous entry, can be used for time travel
-  "contextDelta" BYTEA NOT NULL
+  "contextDelta" BYTEA NOT NULL,
+
+  -- Actions triggered by the transition
+  "actions" BYTEA NOT NULL
 );
 
 CREATE INDEX "journalChartIndex" ON "journalEntries" ("machineId", "chartId");
@@ -42,6 +45,9 @@ CREATE TABLE "fullJournalStates" (
   "state" BYTEA DEFAULT NULL,
   -- Context as serialized JSON,but only mandatory for the first entry
   "context" BYTEA DEFAULT NULL,
+
+  -- Actions triggered by the transition
+  "actions" BYTEA NOT NULL
 
   PRIMARY KEY("machineId", "chartId")
 );

@@ -1,4 +1,4 @@
-import { StateValue } from 'xstate';
+import { StateValue, BaseActionObject } from 'xstate';
 import { createPatch } from 'rfc6902';
 import { from, Observable, Subject, filter } from 'rxjs';
 import { EventObject, StateSchema, Typestate } from 'xstate/lib/types';
@@ -7,6 +7,7 @@ import {
   getCorrelationIdentifier,
   AbstractPersistenceAdapter,
   ChartReference,
+  XJogStateChangeAction,
 } from '@samihult/xjog-util';
 
 import { fullStateFilterByQuery } from './fullStateFilterByQuery';
@@ -105,6 +106,7 @@ export abstract class JournalPersistenceAdapter extends AbstractPersistenceAdapt
    * @param oldContext
    * @param newState
    * @param newContext
+   * @param actions
    * @param cid
    */
   public async record<
@@ -124,6 +126,7 @@ export abstract class JournalPersistenceAdapter extends AbstractPersistenceAdapt
     oldContext: TContext | null,
     newState: StateValue | null,
     newContext: TContext | null,
+    actions: XJogStateChangeAction[] | null,
     cid = getCorrelationIdentifier(),
   ): Promise<void> {
     const logPayload = { in: 'record', ref, cid };
@@ -147,6 +150,7 @@ export abstract class JournalPersistenceAdapter extends AbstractPersistenceAdapt
         event,
         stateDelta,
         contextDelta,
+        actions,
       });
 
       trace('Updating the full state into the database');
@@ -159,6 +163,7 @@ export abstract class JournalPersistenceAdapter extends AbstractPersistenceAdapt
         event,
         state: newState,
         context: newContext,
+        actions,
       });
 
       trace('Emitting a notification that there is a new journal entry');

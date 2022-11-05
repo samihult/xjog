@@ -2,6 +2,7 @@ export * from './ChartReference';
 export * from './ChartIdentifier';
 export * from './ActivityRef';
 export * from './XJogStateChange';
+export * from './XJogActionTypes';
 
 export * from './AbstractPersistenceAdapter';
 export * from './BurstController';

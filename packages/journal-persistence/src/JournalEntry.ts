@@ -1,5 +1,5 @@
 import { EventObject, StateValue } from 'xstate';
-import { ChartReference } from '@samihult/xjog-util';
+import { ChartReference, XJogStateChangeAction } from '@samihult/xjog-util';
 import { Operation } from 'rfc6902';
 
 export type JournalEntry = {
@@ -10,6 +10,7 @@ export type JournalEntry = {
   event: EventObject | null;
   state: StateValue | null;
   context: any | null;
+  actions: XJogStateChangeAction[];
 
   stateDelta: Operation[];
   contextDelta: Operation[];
@@ -25,4 +26,5 @@ export type JournalEntryInsertFields = {
   event: EventObject | null;
   stateDelta: Operation[];
   contextDelta: Operation[];
+  actions: XJogStateChangeAction[];
 };

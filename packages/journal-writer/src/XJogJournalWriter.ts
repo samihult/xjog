@@ -34,6 +34,7 @@ export class XJogJournalWriter extends XJogLogEmitter {
           change.old?.context ?? null,
           change.new?.value ?? null,
           change.new?.context ?? null,
+          change.new?.actions ?? null,
         )
         .catch((err: any) =>
           this.error('Failed to write journal entries', { err }),

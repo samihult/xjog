@@ -62,6 +62,11 @@ import {
   resolveXJogChartOptions,
   XJogChartCreationOptions,
 } from './XJogChartCreationOptions';
+import {
+  resolveXJogCreateStateChange,
+  resolveXJogDeleteStateChange,
+  resolveXJogUpdateStateChange,
+} from './resolveXJogStateChange';
 
 export type XJogSendAction<
   TContext = any,
@@ -203,19 +208,7 @@ export class XJogChart<
         () => stateMachine.resolveState(stateMachine.initialState),
       );
 
-      const change: XJogStateChange = {
-        type: 'create',
-        ref,
-        parentRef,
-        event: toEventObject(state.event),
-        old: null,
-        new: {
-          value: state.value,
-          context: state.context,
-        },
-      };
-
-      console.log('*** ACTIONS', JSON.stringify(state.actions, null, 2));
+      const change = resolveXJogCreateStateChange(ref, parentRef, state);
 
       for (const hook of xJogMachine.xJog.updateHooks) {
         await xJogMachine.xJog.timeExecution(
@@ -372,30 +365,19 @@ export class XJogChart<
       const trace = (...args: Array<string | Record<string, unknown>>) =>
         this.trace({ cid, in: 'runStep' }, ...args);
 
-      const stateBeforeTransition = this.state.value;
-      const contextBeforeTransition = this.state.context;
+      const stateBeforeTransition = JSON.parse(JSON.stringify(this.state));
 
       trace({ message: 'Executing actions' });
       await this.executeActions(this.state, true, false, cid);
 
       trace({ message: 'Emitting next value' });
 
-      const change: XJogStateChange = {
-        type: 'create',
-        ref: this.ref,
-        parentRef: this.parentRef,
-        event: toEventObject(this.state.event),
-        old: {
-          value: stateBeforeTransition,
-          context: contextBeforeTransition,
-        },
-        new: {
-          value: this.state.value,
-          context: this.state.context,
-        },
-      };
-
-      console.log('*** ACTIONS', JSON.stringify(this.state.actions, null, 2));
+      const change = resolveXJogUpdateStateChange(
+        this.ref,
+        this.parentRef,
+        stateBeforeTransition,
+        this.state,
+      );
 
       this.xJogMachine.xJog.changeSubject.next(change);
 
@@ -426,17 +408,11 @@ export class XJogChart<
       trace({ message: 'Entering stopping state' });
       this.stopping = true;
 
-      const change: XJogStateChange = {
-        type: 'delete',
-        ref: this.ref,
-        parentRef: this.parentRef,
-        event: null,
-        old: {
-          value: this.state.value,
-          context: this.state.context,
-        },
-        new: null,
-      };
+      const change = resolveXJogDeleteStateChange(
+        this.ref,
+        this.parentRef,
+        this.state,
+      );
 
       const releaseMutex = await this.xJog.timeExecution(
         'chart.destroy.acquire mutex',
@@ -453,8 +429,6 @@ export class XJogChart<
       await this.persistence?.destroyChart(this.ref, cid);
 
       await releaseMutex();
-
-      console.log('*** ACTIONS', JSON.stringify(this.state.actions, null, 2));
 
       this.xJog.changeSubject.next(change);
       this.xJog.changeSubject.complete();
@@ -526,12 +500,7 @@ export class XJogChart<
       );
 
       trace({ message: 'Saving the current state' });
-      const stateBeforeTransition = JSON.parse(
-        JSON.stringify(this.state.value),
-      );
-      const contextBeforeTransition = JSON.parse(
-        JSON.stringify(this.state.context),
-      );
+      const stateBeforeTransition = JSON.parse(JSON.stringify(this.state));
 
       try {
         if (context) {
@@ -557,22 +526,12 @@ export class XJogChart<
 
         this.xJogMachine.refreshCache(this);
 
-        const change: XJogStateChange = {
-          type: 'update',
-          ref: this.ref,
-          parentRef: this.parentRef,
-          event: toEventObject(scxmlEvent.data),
-          old: {
-            value: stateBeforeTransition,
-            context: contextBeforeTransition,
-          },
-          new: {
-            value: JSON.parse(JSON.stringify(this.state.value)),
-            context: JSON.parse(JSON.stringify(this.state.context)),
-          },
-        };
-
-        console.log('*** ACTIONS', JSON.stringify(this.state.actions, null, 2));
+        const change = resolveXJogUpdateStateChange(
+          this.ref,
+          this.parentRef,
+          stateBeforeTransition,
+          this.state,
+        );
 
         for (const hook of this.xJog.updateHooks) {
           await this.xJog.timeExecution('chart.send.call hook', async () => {

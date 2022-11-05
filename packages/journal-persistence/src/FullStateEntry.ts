@@ -1,5 +1,5 @@
 import { EventObject, StateValue } from 'xstate';
-import { ChartReference } from '@samihult/xjog-util';
+import { ChartReference, XJogStateChangeAction } from "@samihult/xjog-util";
 
 export type FullStateEntry = {
   id: number;
@@ -13,4 +13,5 @@ export type FullStateEntry = {
   event: EventObject | null;
   state: StateValue | null;
   context: any | null;
+  actions: XJogStateChangeAction[];
 };

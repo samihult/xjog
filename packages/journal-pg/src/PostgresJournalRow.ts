@@ -11,4 +11,5 @@ export type PostgresJournalRow = {
   stateDelta: Buffer;
   context: Buffer | null;
   contextDelta: Buffer;
+  actions: Buffer | null;
 };

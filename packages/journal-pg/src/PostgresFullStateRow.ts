@@ -15,4 +15,5 @@ export type PostgresFullStateRow = {
   event: Buffer | null;
   state: Buffer | null;
   context: Buffer | null;
+  actions: Buffer | null;
 };

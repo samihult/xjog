@@ -134,11 +134,13 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
       'INSERT INTO "journalEntries" ' +
         '(' +
         '  "machineId", "chartId", "event",  ' +
-        '  "state", "context", "stateDelta", "contextDelta" ' +
+        '  "state", "context", "stateDelta", "contextDelta", ' +
+        '  "actions' +
         ') ' +
         'VALUES (' +
         '  :machineId, :chartId, :event, ' +
-        '  NULL, NULL, :stateDelta, :contextDelta ' +
+        '  NULL, NULL, :stateDelta, :contextDelta,' +
+        '  :actions ' +
         ') ' +
         'RETURNING ' +
         '  "id", extract(epoch from "timestamp") * 1000 as "timestamp" ',
@@ -148,6 +150,9 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
         event: entry.event ? Buffer.from(JSON.stringify(entry.event)) : null,
         stateDelta: Buffer.from(JSON.stringify(entry.stateDelta)),
         contextDelta: Buffer.from(JSON.stringify(entry.contextDelta)),
+        actions: entry.actions
+          ? Buffer.from(JSON.stringify(entry.actions))
+          : null,
       },
     );
 
@@ -170,19 +175,22 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
         '  "id", "created", "timestamp", ' +
         '  "ownerId", "machineId", "chartId", ' +
         '  "parentMachineId", "parentChartId", ' +
-        '  "event", "state", "context" ' +
+        '  "event", "state", "context",' +
+        '  "actions" ' +
         ') ' +
         'VALUES (' +
         '  :id, to_timestamp(:timestamp::decimal / 1000), ' +
         '  to_timestamp(:timestamp::decimal / 1000), ' +
         '  :ownerId, :machineId, :chartId, ' +
         '  :parentMachineId, :parentChartId, ' +
-        '  :event, :state, :context ' +
+        '  :event, :state, :context,' +
+        '  :actions ' +
         ') ON CONFLICT (' +
         '  "machineId", "chartId" ' +
         ') DO UPDATE SET ' +
         '  "id" = :id, "timestamp" = to_timestamp(:timestamp::decimal / 1000), ' +
-        '  "event" = :event, "state" = :state, "context" = :context ' +
+        '  "event" = :event, "state" = :state, "context" = :context,' +
+        '  "actions" = :actions ' +
         'WHERE "fullJournalStates"."id" < :id ',
       {
         id: entry.id,
@@ -196,6 +204,9 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
         state: entry.state ? Buffer.from(JSON.stringify(entry.state)) : null,
         context: entry.context
           ? Buffer.from(JSON.stringify(entry.context))
+          : null,
+        actions: entry.actions
+          ? Buffer.from(JSON.stringify(entry.actions))
           : null,
       },
     );
@@ -230,7 +241,8 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
   private readonly journalEntrySqlSelectFields =
     '  "id", extract(epoch from "timestamp") * 1000 as "timestamp", ' +
     '  "machineId", "chartId", "event", ' +
-    '  "state", "stateDelta", "context", "contextDelta" ';
+    '  "state", "stateDelta", "context", "contextDelta",' +
+    '  "actions" ';
 
   public async readEntry(id: number): Promise<JournalEntry | null> {
     const result = await this.readConnection.query<PostgresJournalRow>(
@@ -397,7 +409,7 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
     '  "id", extract(epoch from "created") * 1000 as "created", ' +
     '  extract(epoch from "timestamp") * 1000 as "timestamp", ' +
     '  "machineId", "chartId", "parentMachineId", "parentChartId", ' +
-    '  "event", "state", "context" ';
+    '  "event", "state", "context", "actions" ';
 
   public async readFullState(
     ref: ChartReference,
@@ -578,6 +590,7 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
 
       stateDelta: JSON.parse(String(row.stateDelta)),
       contextDelta: JSON.parse(String(row.contextDelta)),
+      actions: row.actions ? JSON.parse(String(row.actions)) : null,
     };
   }
 
@@ -604,6 +617,7 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
       event: JSON.parse(String(row.event)),
       state: row.state ? JSON.parse(String(row.state)) : null,
       context: row.context ? JSON.parse(String(row.context)) : null,
+      actions: row.actions ? JSON.parse(String(row.actions)) : null,
     };
   }
 }
