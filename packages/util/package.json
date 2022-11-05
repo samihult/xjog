@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-util",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "XJog utils",
   "engines": {
     "npm": "forbidden",

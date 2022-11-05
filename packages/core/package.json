@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog",
-  "version": "0.0.299",
+  "version": "0.0.300",
   "description": "XState chart runner for long-running charts",
   "engines": {
     "npm": "forbidden",
@@ -30,8 +30,8 @@
     "prepublishOnly": "yarn lint && yarn build && echo 'should also run: yarn test + yarn check'"
   },
   "dependencies": {
-    "@samihult/xjog-core-persistence": "^0.0.29",
-    "@samihult/xjog-util": "^0.0.25",
+    "@samihult/xjog-core-persistence": "^0.0.30",
+    "@samihult/xjog-util": "^0.0.26",
     "async-mutex": "^0.3.2",
     "rxjs": "^7.4.0",
     "uuid": "^8.3.2",
