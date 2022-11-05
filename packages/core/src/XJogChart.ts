@@ -215,6 +215,8 @@ export class XJogChart<
         },
       };
 
+      console.log('*** ACTIONS', JSON.stringify(state.actions, null, 2));
+
       for (const hook of xJogMachine.xJog.updateHooks) {
         await xJogMachine.xJog.timeExecution(
           'chart.create.call hook',
@@ -248,7 +250,6 @@ export class XJogChart<
           ),
       );
 
-      // chart.updateSubject.next(state);
       xJogMachine.xJog.changeSubject.next(change);
 
       await xJogMachine.xJog.timeExecution(
@@ -377,14 +378,7 @@ export class XJogChart<
       trace({ message: 'Executing actions' });
       await this.executeActions(this.state, true, false, cid);
 
-      // trace({ message: 'Notifying subscribers' });
-      // this.xJog.observerNextValue(
-      //   { ref: this.ref, state: this.state as unknown as State<any> },
-      //   cid,
-      // );
-
       trace({ message: 'Emitting next value' });
-      // this.updateSubject.next(this.state);
 
       const change: XJogStateChange = {
         type: 'create',
@@ -400,6 +394,8 @@ export class XJogChart<
           context: this.state.context,
         },
       };
+
+      console.log('*** ACTIONS', JSON.stringify(this.state.actions, null, 2));
 
       this.xJogMachine.xJog.changeSubject.next(change);
 
@@ -458,8 +454,10 @@ export class XJogChart<
 
       await releaseMutex();
 
+      console.log('*** ACTIONS', JSON.stringify(this.state.actions, null, 2));
+
       this.xJog.changeSubject.next(change);
-      // this.updateSubject.complete();
+      this.xjog.changeSubject.complete();
     });
   }
 
@@ -573,6 +571,8 @@ export class XJogChart<
             context: JSON.parse(JSON.stringify(this.state.context)),
           },
         };
+
+        console.log('*** ACTIONS', JSON.stringify(this.state.actions, null, 2));
 
         for (const hook of this.xJog.updateHooks) {
           await this.xJog.timeExecution('chart.send.call hook', async () => {

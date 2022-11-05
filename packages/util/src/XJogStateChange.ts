@@ -7,6 +7,8 @@ export type XJogStateChange = {
   ref: ChartReference;
   parentRef: ChartReference | null;
   event: EventObject | null;
+  // actions: [];
+  // activities: [];
   old: {
     value: StateValue;
     context: any;

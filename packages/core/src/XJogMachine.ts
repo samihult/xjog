@@ -2,7 +2,6 @@ import { v4 as uuidV4 } from 'uuid';
 import { PersistenceAdapter } from '@samihult/xjog-core-persistence';
 
 import {
-  ChartReference,
   getCorrelationIdentifier,
   LogFields,
   XJogLogEmitter,
