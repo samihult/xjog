@@ -135,7 +135,7 @@ export class PostgresJournalPersistenceAdapter extends JournalPersistenceAdapter
         '(' +
         '  "machineId", "chartId", "event",  ' +
         '  "state", "context", "stateDelta", "contextDelta", ' +
-        '  "actions' +
+        '  "actions" ' +
         ') ' +
         'VALUES (' +
         '  :machineId, :chartId, :event, ' +
