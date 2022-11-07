@@ -438,7 +438,7 @@ export class XJog extends XJogLogEmitter {
         scxmlEvent.origin = new ChartIdentifier(origin).uri.toString();
       }
 
-      return await chart.send(scxmlEvent, context, id, cid);
+      return await chart.send(scxmlEvent, context, sendId, cid);
     });
   }
 
