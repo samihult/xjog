@@ -135,15 +135,18 @@ export class ChartIdentifier implements ChartReference {
   }
 }
 
-export function referencesMatch(a: ChartReference, b: ChartReference): boolean {
+export function referencesMatch(
+  a: string | URL | ChartReference,
+  b: string | URL | ChartReference,
+): boolean {
   return ChartIdentifier.from(a)?.matches(b) ?? false;
 }
 
 /**
  * For e.g. filtering arrays
  */
-export function matchingReference<InputType extends ChartReference>(
-  ref: ChartReference,
-) {
-  return (input: InputType) => referencesMatch(input, ref);
+export function matchingReference(
+  ref: string | URL | ChartReference,
+): (input: string | URL | ChartReference) => boolean {
+  return (input: string | URL | ChartReference) => referencesMatch(input, ref);
 }

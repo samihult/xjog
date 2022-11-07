@@ -422,7 +422,7 @@ export class XJog extends XJogLogEmitter {
     event: Event<TEvent> | SCXML.Event<TEvent>,
     origin?: ChartReference,
     context?: Partial<TContext> | ((context: TContext) => TContext),
-    id: string | number = uuidV4(),
+    sendId: string | number = uuidV4(),
     cid = getCorrelationIdentifier(),
   ): Promise<State<any> | null> {
     return this.timeExecution('xjog.send event', async () => {

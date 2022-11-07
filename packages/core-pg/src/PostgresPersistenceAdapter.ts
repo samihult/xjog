@@ -92,8 +92,8 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
     // TODO resolve
     options: Partial<PostgreSQLPersistenceAdapterOptions> = {},
   ): Promise<PostgresPersistenceAdapter> {
+    // TODO pass logging to the pool
     const pool = new Pool(poolConfiguration);
-
     const adapter = new PostgresPersistenceAdapter(pool, poolConfiguration);
 
     let migrationClient;

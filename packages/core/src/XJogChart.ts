@@ -10,7 +10,6 @@ import {
   ActivityRef,
   LogFields,
   XJogLogEmitter,
-  XJogStateChange,
 } from '@samihult/xjog-util';
 
 import {
@@ -62,6 +61,7 @@ import {
   resolveXJogChartOptions,
   XJogChartCreationOptions,
 } from './XJogChartCreationOptions';
+
 import {
   resolveXJogCreateStateChange,
   resolveXJogDeleteStateChange,
@@ -95,15 +95,18 @@ export type XJogSendAction<
  * @group XJog
  */
 export class XJogChart<
-  TContext = any,
-  TStateSchema extends StateSchema = any,
-  TEvent extends EventObject = EventObject,
-  TTypeState extends Typestate<TContext> = {
-    value: any;
-    context: TContext;
-  },
-  TEmitted = any,
-> extends XJogLogEmitter {
+    TContext = any,
+    TStateSchema extends StateSchema = any,
+    TEvent extends EventObject = EventObject,
+    TTypeState extends Typestate<TContext> = {
+      value: any;
+      context: TContext;
+    },
+    TEmitted = any,
+  >
+  extends XJogLogEmitter
+  implements ChartReference
+{
   public readonly component = 'chart';
 
   public readonly xJog: XJog;
@@ -385,10 +388,18 @@ export class XJogChart<
     });
   }
 
+  public get machineId(): string {
+    return this.xJogMachine.id;
+  }
+
+  public get chartId(): string {
+    return this.id;
+  }
+
   public get ref(): ChartReference {
     return {
-      machineId: this.xJogMachine.id,
-      chartId: this.id,
+      machineId: this.machineId,
+      chartId: this.chartId,
     };
   }
 
@@ -456,22 +467,23 @@ export class XJogChart<
    * @param context Fields to patch the context. Either an object or an updater callback function.
    *   can be called. The callback is called with the context read from the database, and it must
    *   return an object. Object is patched using `Object.assign`, function must return a full context.
-   * @param actionId Id of the send action, has to be unique, see `SendActionObject`
+   * @param sendId Id of the send action, has to be unique, see `SendActionObject`
    * @param cid Optional correlation identifier for debugging purposes
    */
   public async send(
     event: Event<TEvent> | SCXML.Event<TEvent>,
     context?: Partial<TContext> | ((context: TContext) => TContext),
-    actionId: string | number = uuidV4(),
+    // TODO TBD if this really is required if not passed
+    sendId: string | number = uuidV4(),
     cid = getCorrelationIdentifier(),
   ): Promise<State<TContext, TEvent, TStateSchema, TTypeState> | null> {
-    const logPayload = { cid, in: 'send', id: actionId };
+    const logPayload = { cid, in: 'send', sendId };
 
     const trace = (...args: Array<string | Record<string, unknown>>) =>
-      this.trace({ cid, in: 'send', id: actionId }, ...args);
+      this.trace(logPayload, ...args);
 
     const error = (...args: Array<string | Record<string, unknown>>) =>
-      this.error({ cid, in: 'send', id: actionId }, ...args);
+      this.error(logPayload, ...args);
 
     return this.xJog.timeExecution('chart.send', async () => {
       const scxmlEvent = toSCXMLEvent(event);
@@ -481,9 +493,8 @@ export class XJogChart<
         trace({ message: 'Stopping or dying, so deferring this event' });
         await this.xJog.deferredEventManager.defer(
           {
-            // TODO what should we pass as eventId?
-            eventId: actionId,
-            // TODO should we also pass actionId and sendId
+            eventId: sendId,
+            // TODO should we also pass actionId
             ref: this.ref,
             delay: 0,
             event: scxmlEvent,
