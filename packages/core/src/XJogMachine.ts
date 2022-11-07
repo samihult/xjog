@@ -92,6 +92,10 @@ export class XJogMachine<
       const chartCacheKeyIterator = this.chartCacheKeys.values();
       const oldestCacheKey = chartCacheKeyIterator.next()?.value;
       if (oldestCacheKey) {
+        this.trace(
+          { in: 'cleanCache', key: oldestCacheKey },
+          'Removing oldest',
+        );
         await this.evictCacheEntry(oldestCacheKey, false);
       }
     }
@@ -148,6 +152,8 @@ export class XJogMachine<
         ...args,
       );
 
+    const releaseMutex = await this.cacheMutex.acquire();
+
     trace('Creating chart');
     const chart = await XJogChart.create<
       TContext,
@@ -157,7 +163,8 @@ export class XJogMachine<
       TEmitted
     >(this, options);
 
-    await this.refreshCache(chart);
+    await this.refreshCache(chart, false);
+    releaseMutex();
 
     trace({ message: 'Done', chartId: chart.id });
     return chart;
@@ -180,6 +187,8 @@ export class XJogMachine<
       this.debug(logPayload, ...args);
 
     return this.xJog.timeExecution('machine.get chart', async () => {
+      const releaseMutex = await this.cacheMutex.acquire();
+
       if (this.chartCacheStore[chartId]) {
         trace('Cache hit');
         return this.chartCacheStore[chartId];
@@ -195,11 +204,13 @@ export class XJogMachine<
 
       if (!chart) {
         debug('Failed to load');
-        await this.evictCacheEntry(chartId);
+        await this.evictCacheEntry(chartId, false);
         return null;
       }
 
-      await this.refreshCache(chart);
+      await this.refreshCache(chart, false);
+
+      releaseMutex();
 
       trace({ message: 'Done' });
       return chart;
