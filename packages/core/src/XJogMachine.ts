@@ -75,7 +75,10 @@ export class XJogMachine<
     this.options = resolveXJogMachineOptions(xJog.options, options);
     this.persistence = xJog.persistence;
 
-    this.cacheMutex = withTimeout(new Mutex(), 300);
+    this.cacheMutex = withTimeout(
+      new Mutex(),
+      this.options.chartMutexTimeout * 2,
+    );
 
     this.trace({ message: 'Instance created', in: 'constructor' });
   }
@@ -86,6 +89,7 @@ export class XJogMachine<
   }
 
   private async cleanCache(mutex = true) {
+    this.trace({ in: 'cleanCache' }, 'Cleaning cache');
     const releaseMutex = mutex ? await this.cacheMutex.acquire() : null;
     if (this.chartCacheKeys.size > this.options.cacheSize) {
       // Remove oldest
@@ -106,12 +110,8 @@ export class XJogMachine<
     chart: XJogChart<TContext, TStateSchema, TEvent, TTypeState>,
     mutex = true,
   ): Promise<void> {
+    this.trace({ in: 'refreshCache', chartId: chart.id }, 'Refreshing cache');
     const releaseMutex = mutex ? await this.cacheMutex.acquire() : null;
-    this.trace({
-      in: 'refreshCache',
-      message: 'Refreshing cache',
-      chartId: chart.id,
-    });
     this.chartCacheKeys.add(chart.id);
     this.chartCacheStore[chart.id] = chart;
     await this.cleanCache(false);
@@ -120,11 +120,7 @@ export class XJogMachine<
 
   public async evictCacheEntry(chartId: string, mutex = true): Promise<void> {
     const releaseMutex = mutex ? await this.cacheMutex.acquire() : null;
-    this.trace({
-      in: 'evictCacheEntry',
-      message: 'Evicting cache entry',
-      chartId,
-    });
+    this.trace({ in: 'evictCacheEntry', chartId }, 'Evicting cache entry');
     if (this.chartCacheStore[chartId]) {
       await this.chartCacheStore[chartId].wait();
       this.chartCacheKeys.delete(chartId);
@@ -152,9 +148,9 @@ export class XJogMachine<
         ...args,
       );
 
+    trace('Creating chart');
     const releaseMutex = await this.cacheMutex.acquire();
 
-    trace('Creating chart');
     const chart = await XJogChart.create<
       TContext,
       TEvent,
