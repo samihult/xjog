@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-digest-persistence",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "XJog chart digest persistence adapter",
   "engines": {
     "npm": "forbidden",
@@ -26,7 +26,7 @@
     "prePublishOnly": "yarn build"
   },
   "dependencies": {
-    "@samihult/xjog-util": "^0.0.27",
+    "@samihult/xjog-util": "^0.0.28",
     "rxjs": "^7.4.0"
   },
   "devDependencies": {

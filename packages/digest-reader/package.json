@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-digest-reader",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "XJog chart digest reader",
   "engines": {
     "npm": "forbidden",
@@ -28,8 +28,8 @@
     "prePublishOnly": "yarn build"
   },
   "dependencies": {
-    "@samihult/xjog-digest-persistence": "^0.0.17",
-    "@samihult/xjog-util": "^0.0.27",
+    "@samihult/xjog-digest-persistence": "^0.0.18",
+    "@samihult/xjog-util": "^0.0.28",
     "rxjs": "^7.4.0"
   },
   "devDependencies": {

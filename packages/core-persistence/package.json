@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-core-persistence",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "XJog chart abstract persistence",
   "engines": {
     "npm": "forbidden",
@@ -28,7 +28,7 @@
     "prePublishOnly": "yarn build"
   },
   "dependencies": {
-    "@samihult/xjog-util": "^0.0.27",
+    "@samihult/xjog-util": "^0.0.28",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
