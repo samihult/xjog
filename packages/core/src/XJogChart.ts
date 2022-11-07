@@ -450,7 +450,6 @@ export class XJogChart<
       await releaseMutex();
 
       this.xJog.changeSubject.next(change);
-      this.xJog.changeSubject.complete();
     });
   }
 
