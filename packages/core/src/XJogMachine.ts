@@ -185,31 +185,33 @@ export class XJogMachine<
     return this.xJog.timeExecution('machine.get chart', async () => {
       const releaseMutex = await this.cacheMutex.acquire();
 
-      if (this.chartCacheStore[chartId]) {
-        trace('Cache hit');
-        return this.chartCacheStore[chartId];
+      try {
+        if (this.chartCacheStore[chartId]) {
+          trace('Cache hit');
+          return this.chartCacheStore[chartId];
+        }
+
+        trace('Cache miss, loading');
+        const chart = await XJogChart.load<
+          TContext,
+          TStateSchema,
+          TEvent,
+          TTypeState
+        >(this, chartId);
+
+        if (!chart) {
+          debug('Failed to load');
+          await this.evictCacheEntry(chartId, false);
+          return null;
+        }
+
+        await this.refreshCache(chart, false);
+
+        trace({ message: 'Done' });
+        return chart;
+      } finally {
+        releaseMutex();
       }
-
-      trace('Cache miss, loading');
-      const chart = await XJogChart.load<
-        TContext,
-        TStateSchema,
-        TEvent,
-        TTypeState
-      >(this, chartId);
-
-      if (!chart) {
-        debug('Failed to load');
-        await this.evictCacheEntry(chartId, false);
-        return null;
-      }
-
-      await this.refreshCache(chart, false);
-
-      releaseMutex();
-
-      trace({ message: 'Done' });
-      return chart;
     });
   }
 
