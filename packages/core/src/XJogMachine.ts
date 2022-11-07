@@ -1,4 +1,5 @@
 import { PersistenceAdapter } from '@samihult/xjog-core-persistence';
+import { Mutex, MutexInterface, withTimeout } from 'async-mutex';
 
 import {
   getCorrelationIdentifier,
@@ -23,7 +24,6 @@ import {
   ResolvedXJogMachineOptions,
   resolveXJogMachineOptions,
 } from './XJogMachineOptions';
-import { Mutex, MutexInterface, withTimeout } from 'async-mutex';
 
 /**
  * Options for activity spawning

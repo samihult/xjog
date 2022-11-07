@@ -543,7 +543,7 @@ export class XJogChart<
           );
         });
 
-        this.xJogMachine.refreshCache(this);
+        await this.xJogMachine.refreshCache(this);
 
         const change = resolveXJogUpdateStateChange(
           this.ref,
