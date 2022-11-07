@@ -100,7 +100,7 @@ export class XJogMachine<
 
   public async refreshCache(
     chart: XJogChart<TContext, TStateSchema, TEvent, TTypeState>,
-    mutex = true
+    mutex = true,
   ): Promise<void> {
     const releaseMutex = mutex ? await this.cacheMutex.acquire() : null;
     this.trace({
