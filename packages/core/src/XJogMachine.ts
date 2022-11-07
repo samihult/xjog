@@ -23,6 +23,7 @@ import {
   ResolvedXJogMachineOptions,
   resolveXJogMachineOptions,
 } from './XJogMachineOptions';
+import { Mutex, MutexInterface, withTimeout } from 'async-mutex';
 
 /**
  * Options for activity spawning
@@ -53,6 +54,7 @@ export class XJogMachine<
   /** @private Persistence adapter from the XJog instance */
   public readonly persistence: PersistenceAdapter;
 
+  private cacheMutex: MutexInterface;
   private chartCacheKeys = new Set<string>();
   private chartCacheStore: {
     [chartId: string]: XJogChart<TContext, TStateSchema, TEvent, TTypeState>;
@@ -73,6 +75,8 @@ export class XJogMachine<
     this.options = resolveXJogMachineOptions(xJog.options, options);
     this.persistence = xJog.persistence;
 
+    this.cacheMutex = withTimeout(new Mutex(), 300);
+
     this.trace({ message: 'Instance created', in: 'constructor' });
   }
 
@@ -81,20 +85,24 @@ export class XJogMachine<
     return this.machine.id;
   }
 
-  private cleanCache() {
+  private async cleanCache(mutex = true) {
+    const releaseMutex = mutex ? await this.cacheMutex.acquire() : null;
     if (this.chartCacheKeys.size > this.options.cacheSize) {
       // Remove oldest
       const chartCacheKeyIterator = this.chartCacheKeys.values();
       const oldestCacheKey = chartCacheKeyIterator.next()?.value;
       if (oldestCacheKey) {
-        this.evictCacheEntry(oldestCacheKey);
+        await this.evictCacheEntry(oldestCacheKey, false);
       }
     }
+    releaseMutex?.();
   }
 
-  public refreshCache(
+  public async refreshCache(
     chart: XJogChart<TContext, TStateSchema, TEvent, TTypeState>,
-  ): void {
+    mutex = true
+  ): Promise<void> {
+    const releaseMutex = mutex ? await this.cacheMutex.acquire() : null;
     this.trace({
       in: 'refreshCache',
       message: 'Refreshing cache',
@@ -102,17 +110,23 @@ export class XJogMachine<
     });
     this.chartCacheKeys.add(chart.id);
     this.chartCacheStore[chart.id] = chart;
-    this.cleanCache();
+    await this.cleanCache(false);
+    releaseMutex?.();
   }
 
-  public evictCacheEntry(chartId: string): void {
+  public async evictCacheEntry(chartId: string, mutex = true): Promise<void> {
+    const releaseMutex = mutex ? await this.cacheMutex.acquire() : null;
     this.trace({
       in: 'evictCacheEntry',
       message: 'Evicting cache entry',
       chartId,
     });
-    this.chartCacheKeys.delete(chartId);
-    delete this.chartCacheStore[chartId];
+    if (this.chartCacheStore[chartId]) {
+      await this.chartCacheStore[chartId].wait();
+      this.chartCacheKeys.delete(chartId);
+      delete this.chartCacheStore[chartId];
+    }
+    releaseMutex?.();
   }
 
   /**
@@ -143,7 +157,7 @@ export class XJogMachine<
       TEmitted
     >(this, options);
 
-    this.refreshCache(chart);
+    await this.refreshCache(chart);
 
     trace({ message: 'Done', chartId: chart.id });
     return chart;
@@ -181,11 +195,11 @@ export class XJogMachine<
 
       if (!chart) {
         debug('Failed to load');
-        this.evictCacheEntry(chartId);
+        await this.evictCacheEntry(chartId);
         return null;
       }
 
-      this.refreshCache(chart);
+      await this.refreshCache(chart);
 
       trace({ message: 'Done' });
       return chart;

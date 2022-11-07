@@ -217,7 +217,9 @@ export class XJogChart<
         await xJogMachine.xJog.timeExecution(
           'chart.create.call hook',
           async () => {
-            await hook(change);
+            await Promise.resolve(hook(change)).catch((err) =>
+              xJogMachine.xJog.error({ err }, 'Failed to execute hook'),
+            );
           },
         );
       }
@@ -246,14 +248,20 @@ export class XJogChart<
           ),
       );
 
-      xJogMachine.xJog.changeSubject.next(change);
+      const releaseMutex = await chart.chartMutex.acquire();
 
-      await xJogMachine.xJog.timeExecution(
-        'chart.create.execute actions',
-        async () => await chart.executeActions(state, false, false),
-      );
+      try {
+        xJogMachine.xJog.changeSubject.next(change);
 
-      return chart;
+        await xJogMachine.xJog.timeExecution(
+          'chart.create.execute actions',
+          async () => await chart.executeActions(state, false, false),
+        );
+
+        return chart;
+      } finally {
+        releaseMutex();
+      }
     });
   }
 
@@ -410,7 +418,7 @@ export class XJogChart<
   public async destroy({
     cid = getCorrelationIdentifier(),
   } = {}): Promise<void> {
-    this.xJogMachine.evictCacheEntry(this.id);
+    await this.xJogMachine.evictCacheEntry(this.id);
 
     return this.xJog.timeExecution('chart.destroy', async () => {
       const trace = (...args: Array<string | Record<string, unknown>>) =>
@@ -544,16 +552,18 @@ export class XJogChart<
           this.state,
         );
 
-        for (const hook of this.xJog.updateHooks) {
-          await this.xJog.timeExecution('chart.send.call hook', async () => {
-            await hook(change);
-          });
-        }
-
         await this.xJog.timeExecution('chart.send.update chart', async () => {
           trace({ message: 'Updating chart' });
           await this.persistence.updateChart(this.ref, this.state, cid);
         });
+
+        for (const hook of this.xJog.updateHooks) {
+          await this.xJog.timeExecution('chart.send.call hook', async () => {
+            await Promise.resolve(hook(change)).catch((err) =>
+              error({ err }, 'Failed to execute hook'),
+            );
+          });
+        }
 
         this.xJog.changeSubject.next(change);
 
@@ -572,10 +582,6 @@ export class XJogChart<
       }
 
       if (this.state.done && this.parentRef) {
-        // trace({ message: 'Notifying done listeners' });
-        // this.xJog.chartDone(this.ref, doneData);
-
-        // if (this.parentRef) {
         trace({ message: 'Final state reached' });
         const doneData = this.resolveDoneData(this.state, cid);
 
@@ -589,7 +595,6 @@ export class XJogChart<
           undefined,
           cid,
         );
-        // }
       }
 
       trace({ message: 'Done' });
