@@ -324,21 +324,26 @@ export class XJog extends XJogLogEmitter {
       context: TContext;
     },
   >(
-    ref: ChartReference,
+    ref: ChartReference | URL | string,
     cid = getCorrelationIdentifier(),
   ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState> | null> {
+    const chartIdentifier = ChartIdentifier.from(ref);
+
+    if (!chartIdentifier) {
+      this.trace({ in: 'getChart', ref, cid }, 'Failed to parse reference');
+      return null;
+    }
+
     const machine = this.getMachine<TContext, TStateSchema, TEvent, TTypeState>(
-      ref.machineId,
+      chartIdentifier.machineId,
     );
 
-    const chart = await machine.getChart(ref.chartId, cid);
+    const chart = await machine.getChart(chartIdentifier.chartId, cid);
 
-    this.trace({
-      message: chart ? 'Chart found' : 'Chart not found',
-      in: 'getChart',
-      ref,
-      cid,
-    });
+    this.trace(
+      { in: 'getChart', ref, cid },
+      chart ? 'Chart found' : 'Chart not found',
+    );
 
     return chart;
   }

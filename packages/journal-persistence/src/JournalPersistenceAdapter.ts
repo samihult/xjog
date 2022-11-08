@@ -1,4 +1,4 @@
-import { StateValue, BaseActionObject } from 'xstate';
+import { StateValue } from 'xstate';
 import { createPatch } from 'rfc6902';
 import { from, Observable, Subject, filter } from 'rxjs';
 import { EventObject, StateSchema, Typestate } from 'xstate/lib/types';
