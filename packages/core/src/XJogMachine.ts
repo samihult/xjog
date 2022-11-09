@@ -5,6 +5,7 @@ import {
   getCorrelationIdentifier,
   LogFields,
   XJogLogEmitter,
+  XJogStateChange,
 } from '@samihult/xjog-util';
 
 import {
@@ -24,6 +25,7 @@ import {
   ResolvedXJogMachineOptions,
   resolveXJogMachineOptions,
 } from './XJogMachineOptions';
+import { filter, Observable } from 'rxjs';
 
 /**
  * Options for activity spawning
@@ -213,6 +215,12 @@ export class XJogMachine<
         releaseMutex();
       }
     });
+  }
+
+  public get changes(): Observable<XJogStateChange> {
+    return this.xJog.changeSubject.pipe(
+      filter((change) => change.ref.machineId === this.id),
+    );
   }
 
   public async registerExternalId(
