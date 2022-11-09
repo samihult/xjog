@@ -10,6 +10,7 @@ import {
   ActivityRef,
   LogFields,
   XJogLogEmitter,
+  XJogStateChange,
 } from '@samihult/xjog-util';
 
 import {
@@ -1472,13 +1473,8 @@ export class XJogChart<
     return concat(
       of(this.state),
       from(
-        this.xJog.changeSubject.pipe(
-          filter(
-            (change) =>
-              change.ref.machineId === this.ref.machineId &&
-              change.ref.chartId === this.ref.chartId &&
-              !!change.new,
-          ),
+        this.changes.pipe(
+          filter((change) => !!change.new),
           map((change) => {
             if (!change.new) {
               throw new Error('Unexpected condition');
@@ -1490,6 +1486,12 @@ export class XJogChart<
           }),
         ),
       ),
+    );
+  }
+
+  public get changes(): Observable<XJogStateChange> {
+    return this.xJogMachine.changes.pipe(
+      filter((change) => change.ref.chartId === this.ref.chartId),
     );
   }
 
