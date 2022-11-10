@@ -112,6 +112,7 @@ export function resolveXJogDeleteStateChange<
 export function mapActions(
   actions: BaseActionObject[],
 ): XJogStateChangeAction[] {
+  // @ts-ignore
   return actions.map((action) => {
     switch (action.type) {
       case ActionTypes.Send:
@@ -162,7 +163,8 @@ export function mapActions(
         };
 
       default:
-        return { type: XJogActionTypes.Unknown, actionType: action.type };
+        // return { type: XJogActionTypes.Unknown, actionType: action.type };
+        return { type: 'xjog.unknown', actionType: action.type };
     }
   });
 }
