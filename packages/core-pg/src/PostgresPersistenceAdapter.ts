@@ -581,7 +581,12 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
     await connection.query(
       'INSERT INTO "externalId" ' +
         '  ("machineId", "chartId", "key", "value") ' +
-        'VALUES ($1, $2, $3, $4)',
+        'VALUES ' +
+        '  ($1, $2, $3, $4) ' +
+        ') ON CONFLICT ( ' +
+        '  "key", "value" ' +
+        ') DO UPDATE SET ' +
+        '  "machineId" = $1, "chartId" = $2 ',
       [ref.machineId, ref.chartId, key, value],
     );
   }
