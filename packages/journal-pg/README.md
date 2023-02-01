@@ -1,3 +1,3 @@
 # XJog Postgres Persistence
 
-Postgres persistence layer for XJog core.
+Postgres persistence layer for XJog journaling.
