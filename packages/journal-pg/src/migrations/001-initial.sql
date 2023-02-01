@@ -22,7 +22,7 @@ CREATE TABLE "journalEntries" (
   "contextDelta" BYTEA NOT NULL,
 
   -- Actions triggered by the transition
-  "actions" BYTEA NOT NULL
+  "actions" BYTEA DEFAULT NULL
 );
 
 CREATE INDEX "journalChartIndex" ON "journalEntries" ("machineId", "chartId");
@@ -47,7 +47,7 @@ CREATE TABLE "fullJournalStates" (
   "context" BYTEA DEFAULT NULL,
 
   -- Actions triggered by the transition
-  "actions" BYTEA NOT NULL,
+  "actions" BYTEA DEFAULT NULL,
 
   PRIMARY KEY("machineId", "chartId")
 );
