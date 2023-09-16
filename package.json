@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "engines": {
-    "npm": "forbidden",
+    "npm": ">=8.19.4",
     "yarn": "^1.22.8",
     "node": ">=16.x"
   },
