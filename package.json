@@ -7,7 +7,7 @@
   "engines": {
     "npm": "forbidden",
     "yarn": "^1.22.8",
-    "node": "16.x"
+    "node": ">=16.x"
   },
   "scripts": {
     "clean:modules": "./scripts/rm-all-node_modules.sh"

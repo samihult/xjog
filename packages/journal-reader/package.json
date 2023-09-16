@@ -5,7 +5,7 @@
   "engines": {
     "npm": "forbidden",
     "yarn": "^1.22.8",
-    "node": "16.x"
+    "node": ">=16.x"
   },
   "keywords": [
     "statechart",
@@ -28,6 +28,7 @@
     "prePublishOnly": "yarn build"
   },
   "dependencies": {
+    "@samihult/xjog": "^0.0.310",
     "@samihult/xjog-util": "^0.0.28",
     "pg": "^8.7.3",
     "pg-bind": "^1.0.1",
