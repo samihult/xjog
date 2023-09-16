@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-journal-pg",
-  "version": "0.0.110",
+  "version": "0.0.111",
   "description": "XJog Postgres journaling persistence",
   "engines": {
     "npm": "forbidden",
@@ -28,8 +28,8 @@
     "prePublishOnly": "yarn build"
   },
   "dependencies": {
-    "@samihult/xjog-core-persistence": "^0.0.32",
-    "@samihult/xjog-journal-persistence": "^0.0.46",
+    "@samihult/xjog-core-persistence": "^0.0.33",
+    "@samihult/xjog-journal-persistence": "^0.0.47",
     "@samihult/xjog-util": "^0.0.28",
     "node-pg-migrate": "^6.2.1",
     "pg": "^8.7.3",

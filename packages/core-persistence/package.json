@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-core-persistence",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "description": "XJog chart abstract persistence",
   "engines": {
     "npm": "forbidden",
