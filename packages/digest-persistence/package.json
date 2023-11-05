@@ -23,7 +23,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "prePublishOnly": "yarn build"
+    "prePublishOnly": "yarn build",
+    "clean": "rm -rf node_modules lib"
   },
   "dependencies": {
     "@samihult/xjog-util": "^0.0.29",

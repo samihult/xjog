@@ -25,7 +25,8 @@
     "build": "yarn build:bin ; yarn build:files",
     "build:bin": "tsc",
     "build:files": "cpx-fixed 'src/**/*.sql' lib",
-    "prePublishOnly": "yarn build"
+    "prePublishOnly": "yarn build",
+    "clean": "rm -rf node_modules lib"
   },
   "dependencies": {
     "@samihult/xjog-util": "^0.0.29",
