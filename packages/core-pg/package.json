@@ -23,8 +23,9 @@
   ],
   "scripts": {
     "build": "yarn build:bin ; yarn build:files",
-    "build:files": "cpx-fixed 'src/**/*.sql' lib",
     "build:bin": "tsc",
+    "build:files": "cpx-fixed 'src/**/*.sql' lib",
+    "watch": "yarn run build --watch",
     "prePublishOnly": "yarn build",
     "clean": "rm -rf node_modules lib"
   },
