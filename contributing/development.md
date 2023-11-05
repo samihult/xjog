@@ -80,3 +80,40 @@ Use the following branch naming:
 
 Currently, all pull requests require an owner's code review. Reviews by other can speed up the process, so don't shy
 away from that.
+
+## Running tests
+
+XJog has undergone a large-scale refactoring to multiple smaller packages and testing framework needs to be rewritten as
+well. The idea is to have two kinds of tests:
+
+A) Unit tests
+
+In XJog unit tests are going to be a minority. Only write unit tests where you can extract a functional part that has no
+external effects. For example, a simple function that transforms or filters data. For anything more complex, spend your
+effort on writing E2E tests.
+
+To run all unit tests:
+
+```bash
+lerna run test
+```
+
+B) End-to-end tests (E2E)
+
+With end-to-end, the whole stack including the persistence layer, is active. These tests are the most important ones,
+since XJog is sensitive to database idiosyncrasies. Also the XJog's lifecycle functionalities play a crucial part in
+making everything run reliably and smooth.
+
+### Current state of affairs
+
+Presently, no runnable tests. A rudimentary set of test cases can be found under `tests-int` and `tests-e2e` though.
+
+Integration tests were a set of tests that used a mock adapter, but the upkeep cost of a mock adapter is high. They had
+their benefits at the early stages of development, but should be converted to E2E tests now.
+
+Testing should be activated. See the following issues:
+
+- #9
+- #10
+
+
