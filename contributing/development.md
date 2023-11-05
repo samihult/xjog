@@ -113,7 +113,7 @@ their benefits at the early stages of development, but should be converted to E2
 
 Testing should be activated. See the following issues:
 
-- #9
-- #10
+- [#9 Bring back unit tests](https://github.com/samihult/xjog/issues/9)
+- [#10 Re-establish E2E tests](https://github.com/samihult/xjog/issues/10)
 
 
