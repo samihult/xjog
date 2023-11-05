@@ -41,7 +41,7 @@ Please follow the semantic versioning:
 
 All ALPHA versions should be `0.0.x` and BETA versions `0.x.y`.
 
-XJog can be graduated to beta once there is a comprehensive test set and 
+XJog can be graduated to beta once there is a comprehensive test set and
 sufficient documentation.
 
 There are two main ways of versioning and publishing:
@@ -55,11 +55,28 @@ lerna version
 lerna publish from-package
 ```
 
-While in alpha, packages will be pushed to GitHub packages under the `@samihult` 
-namespace. At graduation, the namespace will be converted to `@xjog` and the packages
-will be transferred to an NpmJs repository. In that phase, the publishing will be 
-managed by a GitHub Actions workflow – in the alpha phase it needs to be done
-manually.
+While in alpha, packages will be pushed to GitHub packages under the `@samihult` namespace. At graduation, the namespace
+will be converted to `@xjog` and the packages will be transferred to an NpmJs repository. In that phase, the publishing
+will be managed by a GitHub Actions workflow – in the alpha phase it needs to be done manually.
 
-In order to push to the private GitHub packages repository, you will need a personal
-access token. Ask repository owners for access to your GitHub account.
+In order to push to the private GitHub packages repository, you will need a personal access token. Ask repository owners
+for access to your GitHub account.
+
+## Issues and branching
+
+No direct changes to `main` are allowed.
+
+The preferred way is to track issues. Please
+[link your PR](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)
+to the issue. Small changes may be accepted without an issue in code review.
+
+Use the following branch naming:
+
+- `docs/very-short-description` for a PR that only contains documentation (no code compilation needed)
+- `feature/very-short-description` for new functionality, test or improvement
+- `fix/very-short-description` for a bug fix (please add regression tests and make sure they fail before the fix)
+
+## Reviews
+
+Currently, all pull requests require an owner's code review. Reviews by other can speed up the process, so don't shy
+away from that.
