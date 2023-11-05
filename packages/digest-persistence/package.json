@@ -23,7 +23,6 @@
   ],
   "scripts": {
     "build": "tsc",
-    "watch": "yarn run build --watch",
     "prePublishOnly": "yarn build",
     "clean": "rm -rf node_modules lib"
   },
