@@ -10,9 +10,9 @@
     "node": ">=16.x"
   },
   "scripts": {
-    "clean:modules": "./scripts/rm-all-node_modules.sh"
+    "watch-all": "lerna run build ; lerna watch -- lerna run build --since"
   },
   "devDependencies": {
-    "lerna": "^6.0.1"
+    "lerna": "7.4.2"
   }
 }
