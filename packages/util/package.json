@@ -23,7 +23,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "prePublishOnly": "yarn build"
+    "prePublishOnly": "yarn build",
+    "clean": "rm -rf node_modules lib"
   },
   "dependencies": {
     "rfc6902": "^5.0.1",

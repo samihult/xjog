@@ -27,7 +27,8 @@
     "test": "jest --config jestconfig.js --passWithNoTests",
     "lint": "eslint src/**/*.ts && prettier --check src",
     "format": "prettier --write 'src/**/*.ts'",
-    "prepublishOnly": "yarn lint && yarn build && echo 'should also run: yarn test + yarn check'"
+    "prepublishOnly": "yarn lint && yarn build && echo 'should also run: yarn test + yarn check'",
+    "clean": "rm -rf node_modules lib"
   },
   "dependencies": {
     "@samihult/xjog-core-persistence": "^0.0.34",
