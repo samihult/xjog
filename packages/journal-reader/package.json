@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-journal-reader",
-  "version": "0.0.50",
+  "version": "0.0.51",
   "description": "XJog chart journal reader",
   "engines": {
     "npm": ">=8.19.4",
@@ -29,8 +29,8 @@
     "clean": "rm -rf node_modules lib"
   },
   "dependencies": {
-    "@samihult/xjog": "^0.0.312",
-    "@samihult/xjog-util": "^0.0.29",
+    "@samihult/xjog": "^0.0.313",
+    "@samihult/xjog-util": "^0.0.30",
     "pg": "^8.7.3",
     "pg-bind": "^1.0.1",
     "pg-listen": "^1.7.0",

@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-digest-reader",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "XJog chart digest reader",
   "engines": {
     "npm": ">=8.19.4",
@@ -29,8 +29,8 @@
     "clean": "rm -rf node_modules lib"
   },
   "dependencies": {
-    "@samihult/xjog-digest-persistence": "^0.0.20",
-    "@samihult/xjog-util": "^0.0.29",
+    "@samihult/xjog-digest-persistence": "^0.0.21",
+    "@samihult/xjog-util": "^0.0.30",
     "rxjs": "^7.4.0"
   },
   "devDependencies": {
