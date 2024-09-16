@@ -583,7 +583,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
         '  ("machineId", "chartId", "key", "value") ' +
         'VALUES ' +
         '  ($1, $2, $3, $4) ' +
-        ') ON CONFLICT ( ' +
+        'ON CONFLICT ( ' +
         '  "key", "value" ' +
         ') DO UPDATE SET ' +
         '  "machineId" = $1, "chartId" = $2 ',
