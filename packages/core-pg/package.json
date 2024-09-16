@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-core-pg",
-  "version": "0.0.57",
+  "version": "0.0.58",
   "description": "XJog chart Postgres persistence",
   "engines": {
     "npm": ">=8.19.4",
