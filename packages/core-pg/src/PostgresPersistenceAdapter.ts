@@ -382,7 +382,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
     );
 
     if (!result.rowCount) {
-      throw new ChartNotFoundError(ref, "Chart not found in database.")
+      throw new ChartNotFoundError(ref, 'Chart not found in database.')
     }
 
     return PostgresPersistenceAdapter.parseSqlChartRow<TContext, TEvent>(
@@ -403,7 +403,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
     );
 
     if (!result) {
-      throw new MachineNotFoundError(id, "Machine not found in database.")
+      throw new MachineNotFoundError(id, 'Machine not found in database.')
     }
 
     return result.rows[0].machineId;
