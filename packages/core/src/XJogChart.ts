@@ -284,7 +284,7 @@ export class XJogChart<
     TEvent,
     TTypeState,
     TEmitted
-  >> {
+  > | null> {
     return xJogMachine.xJog.timeExecution('chart.load', async () => {
       const ref = {
         machineId: xJogMachine.id,
@@ -298,21 +298,24 @@ export class XJogChart<
         TTypeState
       >(ref);
 
-      const { state, parentRef } = chart;
+      if (chart) {
+        const { state, parentRef } = chart;
 
-      return new XJogChart<
-        TContext,
-        TStateSchema,
-        TEvent,
-        TTypeState,
-        TEmitted
-      >(
-        xJogMachine,
-        chartId,
-        parentRef,
-        state,
-        resolveXJogChartOptions(xJogMachine.xJog.options, xJogMachine.options),
-      );
+        return new XJogChart<
+          TContext,
+          TStateSchema,
+          TEvent,
+          TTypeState,
+          TEmitted
+        >(
+          xJogMachine,
+          chartId,
+          parentRef,
+          state,
+          resolveXJogChartOptions(xJogMachine.xJog.options, xJogMachine.options),
+        );
+      }
+      return null;
     });
   }
 

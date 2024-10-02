@@ -1,6 +1,7 @@
 export * from './ChartNotFoundError';
 export * from './ChartReference';
 export * from './ChartIdentifier';
+export * from './MachineNotFoundError';
 export * from './ActivityRef';
 export * from './XJogStateChange';
 export * from './XJogActionTypes';

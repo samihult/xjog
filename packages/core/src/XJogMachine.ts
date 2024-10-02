@@ -175,7 +175,7 @@ export class XJogMachine<
   public async getChart(
     chartId: string,
     cid = getCorrelationIdentifier(),
-  ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState>> {
+  ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState> | null> {
     const logPayload = { in: 'getChart', cid, chartId };
 
     const trace = (...args: Array<string | Record<string, unknown>>) =>
@@ -204,15 +204,16 @@ export class XJogMachine<
         if (!chart) {
           debug('Failed to load');
           await this.evictCacheEntry(chartId, false);
+        } else {
+          await this.refreshCache(chart, false);
+
+          trace({ message: 'Done' });
+          return chart;
         }
-
-        await this.refreshCache(chart, false);
-
-        trace({ message: 'Done' });
-        return chart;
       } finally {
         releaseMutex();
       }
+      return null;
     });
   }
 

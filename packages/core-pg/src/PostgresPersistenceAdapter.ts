@@ -6,6 +6,7 @@ import path from 'path';
 import {
   getCorrelationIdentifier,
   ChartNotFoundError,
+  MachineNotFoundError,
   ChartIdentifier,
   ChartReference,
 } from '@samihult/xjog-util';
@@ -387,6 +388,25 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
     return PostgresPersistenceAdapter.parseSqlChartRow<TContext, TEvent>(
       result.rows[0],
     );
+  }
+
+  public async getChartMachineId<TContext, TEvent extends EventObject>(
+    id: string,
+    connection: Pool | PoolClient = this.pool,
+  ): Promise<string> {
+    const result = await connection.query(
+      bind(
+        'SELECT "machineId" FROM "charts" ' +
+        'WHERE "chartId" = :chartId ',
+        { chartId: id },
+      ),
+    );
+
+    if (!result) {
+      throw new MachineNotFoundError(id, "Machine not found in database.")
+    }
+
+    return result.rows[0].machineId;
   }
 
   protected async updateChartState<TContext, TEvent extends EventObject>(

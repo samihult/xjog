@@ -98,6 +98,13 @@ export abstract class PersistenceAdapter<
   /**
    * @abstract
    */
+  public abstract getChartMachineId<TContext, TEvent extends EventObject>(
+    id: string
+  ): Promise<string>;
+
+  /**
+   * @abstract
+   */
   protected abstract updateChartState<TContext, TEvent extends EventObject>(
     ref: ChartReference,
     serializedState: State<

@@ -327,7 +327,7 @@ export class XJog extends XJogLogEmitter {
   >(
     ref: ChartReference | URL | string,
     cid = getCorrelationIdentifier(),
-  ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState>> {
+  ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState> | null> {
     const chartIdentifier = ChartIdentifier.from(ref);
     if (chartIdentifier) {
       const machine = this.getMachine<TContext, TStateSchema, TEvent, TTypeState>(
@@ -345,6 +345,18 @@ export class XJog extends XJogLogEmitter {
     } else {
       this.trace({ in: 'getChart', ref, cid }, 'Failed to parse reference');
     }
+    return null;
+  }
+
+  /**
+   * Retrieves the machine ID associated with the given chart.
+   *
+   * @param chartId - The ID of the chart.
+   * @throws {MachineNotFoundError} If the machine associated with the chart is not found.
+   * @returns A promise that resolves to the machine ID.
+   */
+  public async getChartMachineId(chartId: string): Promise<string> {
+    return this.persistence.getChartMachineId(chartId);
   }
 
   public async registerExternalId(
