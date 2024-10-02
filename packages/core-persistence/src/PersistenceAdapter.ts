@@ -93,7 +93,7 @@ export abstract class PersistenceAdapter<
   protected abstract readChart<TContext, TEvent extends EventObject>(
     ref: ChartReference,
     connection?: ConnectionType,
-  ): Promise<PersistedChart<TContext, TEvent> | null>;
+  ): Promise<PersistedChart<TContext, TEvent>>;
 
   /**
    * @abstract
@@ -472,11 +472,6 @@ export abstract class PersistenceAdapter<
 
     trace({ message: 'Reading chart from the database' });
     const chartRow = await this.readChart<TContext, TEvent>(ref, connection);
-
-    if (!chartRow) {
-      trace({ level: 'warning', message: 'Chart not found in the database' });
-      return null;
-    }
 
     trace({ message: 'Creating state object' });
     const state = State.create<TContext, TEvent>(chartRow.state);

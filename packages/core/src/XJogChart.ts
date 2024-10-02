@@ -284,7 +284,7 @@ export class XJogChart<
     TEvent,
     TTypeState,
     TEmitted
-  > | null> {
+  >> {
     return xJogMachine.xJog.timeExecution('chart.load', async () => {
       const ref = {
         machineId: xJogMachine.id,
@@ -297,10 +297,6 @@ export class XJogChart<
         TStateSchema,
         TTypeState
       >(ref);
-
-      if (!chart) {
-        return null;
-      }
 
       const { state, parentRef } = chart;
 

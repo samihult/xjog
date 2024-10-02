@@ -5,6 +5,7 @@ import path from 'path';
 
 import {
   getCorrelationIdentifier,
+  ChartNotFoundError,
   ChartIdentifier,
   ChartReference,
 } from '@samihult/xjog-util';
@@ -246,7 +247,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
         ')',
     );
 
-    return result.rowCount;
+    return result.rowCount ?? 0;
   }
 
   protected async changeOwnerAndResumePausedCharts(
@@ -370,7 +371,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
   protected async readChart<TContext, TEvent extends EventObject>(
     ref: ChartReference,
     connection: Pool | PoolClient = this.pool,
-  ): Promise<PersistedChart<TContext, TEvent> | null> {
+  ): Promise<PersistedChart<TContext, TEvent>> {
     const result = await connection.query<PostgreSQLChartRow>(
       bind(
         'SELECT * FROM "charts" ' +
@@ -380,7 +381,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
     );
 
     if (!result.rowCount) {
-      return null;
+      throw new ChartNotFoundError(ref, "Chart not found in database.")
     }
 
     return PostgresPersistenceAdapter.parseSqlChartRow<TContext, TEvent>(
@@ -471,7 +472,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
         },
       ),
     );
-    return result.rowCount;
+    return result.rowCount ?? 0;
   }
 
   public async isActivityRegistered(
@@ -540,7 +541,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
         { machineId: ref.machineId, chartId: ref.chartId },
       ),
     );
-    return result.rowCount;
+    return result.rowCount  ?? 0;
   }
 
   public async getExternalIdentifiers(
@@ -601,7 +602,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
       'DELETE FROM "externalId" WHERE "key"=$1 AND "value"=$2',
       [key, value],
     );
-    return result.rowCount;
+    return result.rowCount  ?? 0;
   }
 
   /**
@@ -615,7 +616,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
       'DELETE FROM "externalId" WHERE "machineId"=$1 AND "chartId"=$2',
       [ref.machineId, ref.chartId],
     );
-    return result.rowCount;
+    return result.rowCount ?? 0;
   }
 
   /** Corresponds to {@link PostgreSQLDeferredEventRow} */
@@ -797,7 +798,7 @@ export class PostgresPersistenceAdapter extends PersistenceAdapter<PoolClient> {
       [id],
     );
 
-    return result.rowCount;
+    return result.rowCount ?? 0;
   }
 
   private static parseSqlChartRow<TContext, TEvent extends EventObject>(

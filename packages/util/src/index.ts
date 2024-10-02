@@ -1,3 +1,4 @@
+export * from './ChartNotFoundError';
 export * from './ChartReference';
 export * from './ChartIdentifier';
 export * from './ActivityRef';

@@ -313,7 +313,8 @@ export class XJog extends XJogLogEmitter {
    *   return an object. In both cases the context is patched using `Object.assign`.
    * @param cid Optional correlation identifier for debugging purposes.
    *
-   * @returns The chart, if found; `null`, if not found
+   * @returns The chart, if found.
+   * @throws {ChartNotFoundError} If the chart is not found.
    */
   public async getChart<
     TContext = DefaultContext,
@@ -326,26 +327,24 @@ export class XJog extends XJogLogEmitter {
   >(
     ref: ChartReference | URL | string,
     cid = getCorrelationIdentifier(),
-  ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState> | null> {
+  ): Promise<XJogChart<TContext, TStateSchema, TEvent, TTypeState>> {
     const chartIdentifier = ChartIdentifier.from(ref);
+    if (chartIdentifier) {
+      const machine = this.getMachine<TContext, TStateSchema, TEvent, TTypeState>(
+        chartIdentifier.machineId,
+      );
 
-    if (!chartIdentifier) {
+      const chart = await machine.getChart(chartIdentifier.chartId, cid);
+
+      this.trace(
+        { in: 'getChart', ref, cid },
+        chart ? 'Chart found' : 'Chart not found',
+      );
+
+      return chart;
+    } else {
       this.trace({ in: 'getChart', ref, cid }, 'Failed to parse reference');
-      return null;
     }
-
-    const machine = this.getMachine<TContext, TStateSchema, TEvent, TTypeState>(
-      chartIdentifier.machineId,
-    );
-
-    const chart = await machine.getChart(chartIdentifier.chartId, cid);
-
-    this.trace(
-      { in: 'getChart', ref, cid },
-      chart ? 'Chart found' : 'Chart not found',
-    );
-
-    return chart;
   }
 
   public async registerExternalId(
