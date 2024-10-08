@@ -39,7 +39,6 @@ import {
   resolveXJogOptions,
   ResolvedXJogOptions,
 } from './XJogOptions';
-import { ChartError } from '@samihult/xjog-util/lib/ChartError';
 
 /**
  * Emits following events:
