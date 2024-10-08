@@ -309,8 +309,6 @@ export class XJogChart<
         machineId: xJogMachine.id,
         chartId,
       };
-      console.log('------ chartId -------');
-      console.log(chartId);
 
       const chart = await xJogMachine.persistence?.loadChart<
         TContext,
