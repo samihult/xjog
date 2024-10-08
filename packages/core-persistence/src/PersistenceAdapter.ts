@@ -90,6 +90,14 @@ export abstract class PersistenceAdapter<
   /**
    * @abstract
    */
+  protected abstract chartExists(
+    ref: ChartReference,
+    connection?: ConnectionType,
+  ): Promise<boolean>;
+
+  /**
+   * @abstract
+   */
   protected abstract readChart<TContext, TEvent extends EventObject>(
     ref: ChartReference,
     connection?: ConnectionType,
@@ -446,6 +454,13 @@ export abstract class PersistenceAdapter<
     await this.insertChart(instanceId, ref, parentRef, state);
 
     trace({ message: 'Done' });
+  }
+
+  public async isChartPresent(
+    ref: ChartReference,
+    connection?: ConnectionType
+  ) {
+    return await this.chartExists(ref, connection);
   }
 
   /**

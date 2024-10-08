@@ -39,6 +39,7 @@ import {
   resolveXJogOptions,
   ResolvedXJogOptions,
 } from './XJogOptions';
+import { ChartError } from '@samihult/xjog-util/lib/ChartError';
 
 /**
  * Emits following events:
@@ -302,6 +303,31 @@ export class XJog extends XJogLogEmitter {
     this.emit('halt');
 
     trace('Done');
+  }
+
+  public async isChartAvailable<
+    TContext = DefaultContext,
+    TStateSchema extends StateSchema = any,
+    TEvent extends EventObject = EventObject,
+    TTypeState extends Typestate<TContext> = {
+      value: any;
+      context: TContext;
+    },
+  >(
+    ref: ChartReference | URL | string
+  ) {
+    const chartIdentifier = ChartIdentifier.from(ref);
+
+    if (!chartIdentifier) {
+      this.trace({ in: 'verifyChart', ref }, 'Failed to parse reference');
+      return null;
+    }
+
+    const machine = this.getMachine<TContext, TStateSchema, TEvent, TTypeState>(
+      chartIdentifier.machineId,
+    );
+
+    return await machine.isChartAvailable(chartIdentifier.chartId);
   }
 
   /**
