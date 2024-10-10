@@ -273,7 +273,7 @@ export class XJogChart<
     TTypeState extends Typestate<TContext> = {
       value: any;
       context: TContext;
-    }
+    },
   >(
     xJogMachine: XJogMachine<TContext, TStateSchema, TEvent, TTypeState>,
     chartId: string,

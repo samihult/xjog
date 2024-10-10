@@ -168,13 +168,8 @@ export class XJogMachine<
     return chart;
   }
 
-  public async isChartAvailable(
-    chartId: string
-  ) {
-    return await XJogChart.exists<
-      TContext,
-      TStateSchema
-    >(this, chartId);
+  public async isChartAvailable(chartId: string) {
+    return await XJogChart.exists<TContext, TStateSchema>(this, chartId);
   }
 
   /**

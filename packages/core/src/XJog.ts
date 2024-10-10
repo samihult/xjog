@@ -312,14 +312,12 @@ export class XJog extends XJogLogEmitter {
       value: any;
       context: TContext;
     },
-  >(
-    ref: ChartReference | URL | string
-  ) {
+  >(ref: ChartReference | URL | string) {
     const chartIdentifier = ChartIdentifier.from(ref);
 
     if (!chartIdentifier) {
       this.trace({ in: 'verifyChart', ref }, 'Failed to parse reference');
-      return null;
+      return false;
     }
 
     const machine = this.getMachine<TContext, TStateSchema, TEvent, TTypeState>(
