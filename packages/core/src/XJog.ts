@@ -316,7 +316,7 @@ export class XJog extends XJogLogEmitter {
     const chartIdentifier = ChartIdentifier.from(ref);
 
     if (!chartIdentifier) {
-      this.trace({ in: 'verifyChart', ref }, 'Failed to parse reference');
+      this.trace({ in: 'isChartAvailable', ref }, 'Failed to parse reference');
       return false;
     }
 
