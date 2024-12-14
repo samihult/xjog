@@ -304,6 +304,29 @@ export class XJog extends XJogLogEmitter {
     trace('Done');
   }
 
+  public async isChartAvailable<
+    TContext = DefaultContext,
+    TStateSchema extends StateSchema = any,
+    TEvent extends EventObject = EventObject,
+    TTypeState extends Typestate<TContext> = {
+      value: any;
+      context: TContext;
+    },
+  >(ref: ChartReference | URL | string) {
+    const chartIdentifier = ChartIdentifier.from(ref);
+
+    if (!chartIdentifier) {
+      this.trace({ in: 'verifyChart', ref }, 'Failed to parse reference');
+      return false;
+    }
+
+    const machine = this.getMachine<TContext, TStateSchema, TEvent, TTypeState>(
+      chartIdentifier.machineId,
+    );
+
+    return await machine.isChartAvailable(chartIdentifier.chartId);
+  }
+
   /**
    * A shortcut method to get a XJogChart by identifier. Use {@link XJogMachine#getChart}
    * instead if you need properly typed chart instance.

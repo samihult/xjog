@@ -266,6 +266,25 @@ export class XJogChart<
     });
   }
 
+  public static async exists<
+    TContext = any,
+    TStateSchema extends StateSchema = any,
+    TEvent extends EventObject = EventObject,
+    TTypeState extends Typestate<TContext> = {
+      value: any;
+      context: TContext;
+    },
+  >(
+    xJogMachine: XJogMachine<TContext, TStateSchema, TEvent, TTypeState>,
+    chartId: string,
+  ) {
+    const ref = {
+      machineId: xJogMachine.id,
+      chartId,
+    };
+    return xJogMachine.persistence.isChartPresent(ref);
+  }
+
   public static async load<
     TContext = any,
     TStateSchema extends StateSchema = any,

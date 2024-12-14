@@ -168,6 +168,10 @@ export class XJogMachine<
     return chart;
   }
 
+  public async isChartAvailable(chartId: string) {
+    return await XJogChart.exists<TContext, TStateSchema>(this, chartId);
+  }
+
   /**
    * @param chartId Unique identifier of the chart.
    * @param cid
