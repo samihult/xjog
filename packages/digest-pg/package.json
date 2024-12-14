@@ -1,6 +1,6 @@
 {
   "name": "@samihult/xjog-digest-pg",
-  "version": "0.0.115",
+  "version": "0.0.116",
   "description": "XJog Postgres digest persistence",
   "engines": {
     "npm": ">=8.19.4",
@@ -29,8 +29,8 @@
     "clean": "rm -rf node_modules lib"
   },
   "dependencies": {
-    "@samihult/xjog-digest-persistence": "^0.0.22",
-    "@samihult/xjog-util": "^0.0.31",
+    "@samihult/xjog-digest-persistence": "^0.0.23",
+    "@samihult/xjog-util": "^0.0.32",
     "node-pg-migrate": "^6.2.1",
     "pg": "^8.7.3",
     "pg-bind": "^1.0.1",
