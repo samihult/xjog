@@ -5,7 +5,7 @@
   "author": "Juha Mustonen <juha.mustonen@iki.fi>",
   "homepage": "",
   "license": "MIT",
-  "main": "lib/journal-pglite.js",
+  "main": "lib",
   "directories": {
     "lib": "lib"
   },
